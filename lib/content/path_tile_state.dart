@@ -50,9 +50,6 @@ class _PathTileState extends State<PathTile>
   @override
   void initState() {
     super.initState();
-    debugPrint(
-      'Initializing PathTile with ${widget.localizedFlights.length} flight paths',
-    );
     _isExpanded = widget.initiallyExpanded;
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
@@ -163,7 +160,6 @@ class _PathTileState extends State<PathTile>
     final paddingHeight = 24;
     final calculatedHeaderHeight = titleHeight + subtitleHeight + paddingHeight;
 
-    debugPrint('build expansiontile with _isExpanded: $_isExpanded');
     return ExpansionTile(
       controller: _expansionController,
       initiallyExpanded: _isExpanded,

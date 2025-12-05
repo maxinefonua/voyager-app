@@ -37,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # allows launching url
-  url_launcher: ^6.1.11
+  url_launcher: ^ 6.2.5
   provider: ^6.1.1
   http: ^1.1.0 
 

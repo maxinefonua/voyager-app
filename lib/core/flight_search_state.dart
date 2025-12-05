@@ -398,6 +398,15 @@ class FlightSearchState with ChangeNotifier {
     notifyListeners();
   }
 
+  void clearAirline() {
+    _selectedAirline = null;
+    _isUpdating = true;
+    _isUpdatingDeparture = true;
+    _isUpdatingReturn = true;
+    notifyListeners();
+    updateSearch();
+  }
+
   void reverseAirports() {
     final temp = _departureAirport;
     _departureAirport = _destinationAirport;

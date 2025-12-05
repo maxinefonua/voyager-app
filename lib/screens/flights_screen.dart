@@ -67,7 +67,7 @@ class FlightResultsScaffold extends StatelessWidget {
         Divider(height: 0),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          child: AirlineDropdown(),
+          child: AirlineFilter(),
         ),
         DateFilter(searchState: searchState, isDeparture: isDeparture),
         PathResults(isDeparture: isDeparture),
