@@ -24,78 +24,96 @@ class SearchSummaryContent extends StatelessWidget {
       origin = searchState.destinationAirport!;
       destination = searchState.departureAirport!;
     }
-    return ListTile(
-      contentPadding: EdgeInsets.only(left: 18, right: 18, top: 16, bottom: 8),
-      // visualDensity: VisualDensity.comfortable,
-      tileColor: Theme.of(context).cardColor,
-      // padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
-      title: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              AirportCircleIcon(
-                isOrigin: isDeparture,
-                airport: origin,
-                size: 32,
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  '${origin.city}, ${origin.subdivision}',
-                  maxLines: 2,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w300,
-                    color: Theme.of(context).shadowColor,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              SizedBox(width: 8),
-              Icon(
-                Icons.arrow_forward,
-                size: 20,
-                color: Theme.of(context).shadowColor,
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  '${destination.city}, ${destination.subdivision}',
-                  maxLines: 2,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w300,
-                    color: Theme.of(context).shadowColor,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              SizedBox(width: 8),
-              AirportCircleIcon(
-                isOrigin: !isDeparture,
-                airport: destination,
-                size: 32,
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-        ],
-      ),
-      onTap: () => showDialog(
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: _buildOriginToDestinationContent(context, origin, destination),
+    );
+  }
+
+  Widget _buildInfoButton(BuildContext context) {
+    return TextButton(
+      onPressed: () => showDialog(
         context: context,
         builder: (context) => NearbyDialog(
           isDeparture: isDeparture,
           countryService: countryService,
         ),
       ),
-      subtitle: Text(
-        'Tap for nearby airports',
+      child: Text(
+        'ⓘ Tap for Airport Details',
         style: TextStyle(fontSize: 12),
         textAlign: TextAlign.center,
       ),
+    );
+  }
+
+  Widget _buildOriginToDestinationContent(
+    BuildContext context,
+    Airport origin,
+    Airport destination,
+  ) {
+    return Row(
+      children: [
+        AirportCircleIcon(isOrigin: isDeparture, airport: origin, size: 32),
+        SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildAirportText(
+                      context,
+                      origin,
+                      origin.countryCode != destination.countryCode,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(
+                    Icons.arrow_forward,
+                    size: 16,
+                    color: Theme.of(context).shadowColor,
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: _buildAirportText(
+                      context,
+                      destination,
+                      destination.countryCode != origin.countryCode,
+                    ),
+                  ),
+                ],
+              ),
+
+              _buildInfoButton(context),
+            ],
+          ),
+        ),
+        SizedBox(width: 8),
+        AirportCircleIcon(
+          isOrigin: !isDeparture,
+          airport: destination,
+          size: 32,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAirportText(
+    BuildContext context,
+    Airport airport,
+    bool differentCountry,
+  ) {
+    return Text(
+      '${airport.city}, ${airport.subdivision}',
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w300,
+        color: Theme.of(context).shadowColor,
+      ),
+      maxLines: 1,
+      textAlign: TextAlign.center,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

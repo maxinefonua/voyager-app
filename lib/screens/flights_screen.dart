@@ -4,7 +4,7 @@ import 'package:voyager/content/bottom_bar.dart';
 import 'package:voyager/content/path_results_state.dart';
 import 'package:voyager/content/search_summary.dart';
 import 'package:voyager/core/flight_search_state.dart';
-import 'package:voyager/filters/airline_radio.dart';
+import 'package:voyager/filters/airline_filter.dart';
 import 'package:voyager/filters/date_filter.dart';
 import 'package:voyager/services/country_service.dart';
 
@@ -58,7 +58,6 @@ class FlightResultsScaffold extends StatelessWidget {
   ) {
     return Column(
       children: [
-        // SearchSummaryHeader(isDeparture: isDeparture),
         SearchSummaryContent(
           countryService: countryService,
           searchState: searchState,
