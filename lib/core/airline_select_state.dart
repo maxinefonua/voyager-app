@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:voyager/core/flight_search_state.dart';
 import 'package:voyager/filters/airline_option_list.dart';
 import 'package:voyager/models/airline/airline.dart';
 
 class AirlineSelectState extends StatefulWidget {
   final Airline? selectedAirline;
   final List<Airline>? enabledAirlines;
+  final ValueChanged<Airline?> onSelected;
   const AirlineSelectState({
     super.key,
     required this.selectedAirline,
     required this.enabledAirlines,
+    required this.onSelected,
   });
 
   @override
@@ -18,16 +18,22 @@ class AirlineSelectState extends StatefulWidget {
 }
 
 class _AirlineSelectStateState extends State<AirlineSelectState> {
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+
   late Airline? _currentSelection;
   late List<Airline>? _enabledAirlines;
-  late String _searchQuery;
+  late bool _showDisabled;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _searchFocusNode.requestFocus();
+    });
     _currentSelection = widget.selectedAirline;
     _enabledAirlines = widget.enabledAirlines;
-    _searchQuery = '';
+    _showDisabled = false;
   }
 
   @override
@@ -45,65 +51,33 @@ class _AirlineSelectStateState extends State<AirlineSelectState> {
     }
   }
 
-  void _selectAirline(Airline? airline) {
-    setState(() {
-      _currentSelection = airline;
-    });
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final searchState = context.watch<FlightSearchState>();
+    final disabledCount = AirlineOptionList.airlineValues
+        .where((airline) => !(_enabledAirlines?.contains(airline) ?? true))
+        .length;
     return Column(
       children: [
-        _buildDragHandle(),
-        SizedBox(height: 16),
-        _buildHeader(),
-        SizedBox(height: 8),
+        _buildHeader(disabledCount),
         _buildSearchBar(),
-        SizedBox(height: 16),
         Divider(height: 0),
         Expanded(
           child: AirlineOptionList(
             selectedAirline: _currentSelection,
             enabledAirlines: _enabledAirlines,
-            onAirlineSelected: _selectAirline,
-            searchQuery: _searchQuery,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8),
-          child: Row(
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[300],
-                    foregroundColor: Colors.grey[800],
-                  ),
-                  child: Text('Cancel'),
-                ),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_currentSelection != widget.selectedAirline) {
-                      if (_currentSelection == null) {
-                        searchState.clearAirline();
-                      } else {
-                        searchState.updateSearch(
-                          selectedAirline: _currentSelection,
-                        );
-                      }
-                    }
-                    Navigator.pop(context);
-                  },
-                  child: Text('Confirm'),
-                ),
-              ),
-            ],
+            onAirlineSelected: (airline) {
+              widget.onSelected(airline);
+              Navigator.pop(context);
+            },
+            searchQuery: _searchController.text.toLowerCase(),
+            showDisabled: _showDisabled,
           ),
         ),
       ],
@@ -112,55 +86,71 @@ class _AirlineSelectStateState extends State<AirlineSelectState> {
 
   Widget _buildSearchBar() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.all(16),
       child: TextField(
-        onChanged: (value) {
-          setState(() {
-            _searchQuery = value;
-          });
-        },
+        controller: _searchController,
+        focusNode: _searchFocusNode,
         decoration: InputDecoration(
           hintText: 'Search airlines...',
-          prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.grey[300]!),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.grey[300]!),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.blue),
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          filled: true,
-          fillColor: Colors.grey[50],
+          prefixIcon: Icon(Icons.search),
+          border: OutlineInputBorder(),
         ),
-        autofocus: false,
+        autofocus: true,
+        onChanged: (value) => setState(() {}),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Text(
-        'Select Airline',
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget _buildDragHandle() {
+  Widget _buildHeader(int disabledCount) {
     return Container(
-      margin: EdgeInsets.only(top: 8),
-      width: 40,
-      height: 4,
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(2),
+        border: Border(bottom: BorderSide(color: Colors.grey[300]!)),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
+          SizedBox(width: 8),
+          Text(
+            'Select Airline',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
+          if (disabledCount > 0) ...[
+            Spacer(),
+            _buildShowDisabledToggle(disabledCount),
+            SizedBox(width: 10),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShowDisabledToggle(int disabledCount) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Badge(
+        label: Text(disabledCount.toString()),
+        isLabelVisible: disabledCount > 0,
+        child: TextButton.icon(
+          onPressed: () {
+            setState(() {
+              _showDisabled = !_showDisabled;
+            });
+          },
+          icon: Icon(
+            _showDisabled
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+            size: 18,
+          ),
+          label: Text('Disabled'),
+          style: TextButton.styleFrom(
+            foregroundColor: _showDisabled ? Colors.blue : Colors.grey,
+          ),
+        ),
       ),
     );
   }

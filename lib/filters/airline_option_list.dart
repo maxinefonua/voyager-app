@@ -6,6 +6,7 @@ class AirlineOptionList extends StatelessWidget {
   final List<Airline>? enabledAirlines;
   final ValueChanged<Airline?> onAirlineSelected;
   final String searchQuery;
+  final bool showDisabled;
 
   static final List<Airline> airlineValues = Airline.sortedValues();
 
@@ -15,15 +16,21 @@ class AirlineOptionList extends StatelessWidget {
     required this.enabledAirlines,
     required this.onAirlineSelected,
     required this.searchQuery,
+    required this.showDisabled,
   });
 
   @override
   Widget build(BuildContext context) {
     final filteredAirlines = airlineValues.where((airline) {
-      if (searchQuery.isEmpty) return true;
-      final query = searchQuery.toLowerCase();
-      return airline.displayText.toLowerCase().contains(query) ||
-          airline.name.toLowerCase().contains(query);
+      if (searchQuery.isNotEmpty) {
+        final query = searchQuery.toLowerCase();
+        final matchesSearch =
+            airline.displayText.toLowerCase().contains(query) ||
+            airline.name.toLowerCase().contains(query);
+        if (!matchesSearch) return false;
+      }
+      final isEnabled = enabledAirlines?.contains(airline) ?? true;
+      return showDisabled || isEnabled;
     }).toList();
 
     if (filteredAirlines.isEmpty) {
@@ -39,7 +46,6 @@ class AirlineOptionList extends StatelessWidget {
         // Scroll to selected item after build
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (selectedAirline == null) {
-            // Scroll to "All Airlines"
             if (allAirlinesKey.currentContext != null) {
               Scrollable.ensureVisible(
                 allAirlinesKey.currentContext!,
@@ -134,7 +140,7 @@ class AirlineOptionList extends StatelessWidget {
       key: key, // Assign the key to the ListTile
       title: const Padding(
         padding: EdgeInsets.symmetric(horizontal: 8.0),
-        child: Text('All Airlines'),
+        child: Text('Multi-Airline'),
       ),
       trailing: Radio<Airline?>(value: null, toggleable: true),
       onTap: () => onAirlineSelected(null),
