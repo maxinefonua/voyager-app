@@ -167,6 +167,11 @@ class FlightSearchState with ChangeNotifier {
           [_departureAirport!.iata],
           [_destinationAirport!.iata],
         );
+        if (_enabledAirlines != null && _selectedAirline != null) {
+          if (!_enabledAirlines!.contains(_selectedAirline)) {
+            _selectedAirline = null;
+          }
+        }
         notifyListeners();
 
         _nearbyDepartureAirports = await _airportCache.fetchNearbyAirports(

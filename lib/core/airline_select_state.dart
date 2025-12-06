@@ -58,6 +58,17 @@ class _AirlineSelectStateState extends State<AirlineSelectState> {
     super.dispose();
   }
 
+  Future<void> _handleSelection(Airline? airline) async {
+    if (airline == _currentSelection) return;
+    setState(() {
+      _currentSelection = airline;
+    });
+    widget.onSelected(airline);
+    await Future.delayed(Duration(milliseconds: 500));
+    if (!mounted) return;
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     final disabledCount = AirlineOptionList.airlineValues
@@ -72,10 +83,7 @@ class _AirlineSelectStateState extends State<AirlineSelectState> {
           child: AirlineOptionList(
             selectedAirline: _currentSelection,
             enabledAirlines: _enabledAirlines,
-            onAirlineSelected: (airline) {
-              widget.onSelected(airline);
-              Navigator.pop(context);
-            },
+            onAirlineSelected: _handleSelection,
             searchQuery: _searchController.text.toLowerCase(),
             showDisabled: _showDisabled,
           ),
@@ -146,7 +154,7 @@ class _AirlineSelectStateState extends State<AirlineSelectState> {
                 : Icons.visibility_off_outlined,
             size: 18,
           ),
-          label: Text('Disabled'),
+          label: Text('Filtered'),
           style: TextButton.styleFrom(
             foregroundColor: _showDisabled ? Colors.blue : Colors.grey,
           ),

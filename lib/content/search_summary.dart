@@ -33,7 +33,7 @@ class SearchSummaryContent extends StatelessWidget {
             children: [
               _buildAirportBadge(isDeparture, origin),
               SizedBox(width: 12),
-              _buildAirportNameSection(origin, destination),
+              Expanded(child: _buildAirportNameSection(origin, destination)),
               SizedBox(width: 12),
               _buildAirportBadge(!isDeparture, destination),
             ],
@@ -69,7 +69,12 @@ class SearchSummaryContent extends StatelessWidget {
     );
   }
 
-  _buildAirportNameSection(Airport origin, Airport destination) {
-    return Text('${origin.city} → ${destination.city}');
+  Widget _buildAirportNameSection(Airport origin, Airport destination) {
+    return Text(
+      '${origin.city} → ${destination.city}',
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.center,
+    );
   }
 }

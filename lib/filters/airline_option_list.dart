@@ -33,10 +33,6 @@ class AirlineOptionList extends StatelessWidget {
       return showDisabled || isEnabled;
     }).toList();
 
-    if (filteredAirlines.isEmpty) {
-      return _buildNoResults();
-    }
-
     // Create keys for scrolling
     final GlobalKey allAirlinesKey = GlobalKey();
     final Map<Airline, GlobalKey> airlineKeys = {};
@@ -72,9 +68,12 @@ class AirlineOptionList extends StatelessWidget {
           onChanged: onAirlineSelected,
           child: Column(
             children: [
-              if (searchQuery.isEmpty)
-                _buildAllAirlinesOption(key: allAirlinesKey),
-              if (searchQuery.isEmpty) const Divider(height: 0),
+              _buildAllAirlinesOption(key: allAirlinesKey),
+              Divider(height: 0),
+              if (searchQuery.isNotEmpty && filteredAirlines.isEmpty)
+                Expanded(child: _buildNoResults()),
+              if (searchQuery.isEmpty && filteredAirlines.isEmpty)
+                Expanded(child: _buildNoEnabledAirlines()),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -99,52 +98,92 @@ class AirlineOptionList extends StatelessWidget {
 
   Widget _buildAirlineOption(Airline airline, {GlobalKey? key}) {
     final isEnabled = enabledAirlines?.contains(airline) ?? true;
-    return ListTile(
-      key: key, // Assign the key to the ListTile
-      tileColor: airline == selectedAirline ? Colors.grey[200] : null,
-      enabled: isEnabled,
-      leading: Container(
-        padding: EdgeInsets.zero,
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: isEnabled ? Colors.blue[50] : Colors.grey[100],
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          Icons.airlines,
-          size: 20,
-          color: isEnabled ? Colors.blue[500] : Colors.grey[400],
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: isEnabled ? () => onAirlineSelected(airline) : null,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          color: airline == selectedAirline ? Colors.grey[100] : null,
+          child: ListTile(
+            key: key,
+            enabled: isEnabled,
+            leading: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: isEnabled ? Colors.blue[50] : Colors.grey[50],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.airlines,
+                size: 20,
+                color: isEnabled ? Colors.blue[500] : Colors.grey[400],
+              ),
+            ),
+            title: Text(
+              airline.displayText,
+              style: TextStyle(
+                fontSize: 16,
+                color: isEnabled ? Colors.grey[800] : Colors.grey[400],
+                fontWeight: isEnabled ? FontWeight.w500 : FontWeight.normal,
+              ),
+            ),
+            trailing: Radio<Airline?>(
+              enabled: isEnabled,
+              value: airline,
+              toggleable: true,
+            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16),
+          ),
         ),
       ),
-      title: Text(
-        airline.displayText,
-        style: TextStyle(
-          fontSize: 16,
-          color: isEnabled ? Colors.grey[800] : Colors.grey[400],
-          fontWeight: isEnabled ? FontWeight.w500 : FontWeight.normal,
-        ),
-      ),
-      trailing: Radio<Airline?>(
-        enabled: isEnabled,
-        value: airline,
-        toggleable: true,
-      ),
-      onTap: isEnabled ? () => onAirlineSelected(airline) : null,
-      contentPadding: EdgeInsets.symmetric(horizontal: 16),
     );
   }
 
   Widget _buildAllAirlinesOption({GlobalKey? key}) {
-    return ListTile(
-      key: key, // Assign the key to the ListTile
-      title: const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8.0),
-        child: Text('Multi-Airline'),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => onAirlineSelected(null),
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          color: selectedAirline == null ? Colors.grey[100] : null,
+          child: ListTile(
+            title: Text(
+              'Multi-Airline',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[800],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            trailing: Radio<Airline?>(value: null, toggleable: true),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16),
+          ),
+        ),
       ),
-      trailing: Radio<Airline?>(value: null, toggleable: true),
-      onTap: () => onAirlineSelected(null),
-      contentPadding: EdgeInsets.symmetric(horizontal: 16),
+    );
+  }
+
+  Widget _buildNoEnabledAirlines() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.connecting_airports, size: 48, color: Colors.grey[400]),
+          SizedBox(height: 16),
+          Text(
+            'No Airlines Enabled for Filtering',
+            style: TextStyle(color: Colors.grey[500], fontSize: 16),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Any flight paths are via multi-airline connections',
+            style: TextStyle(color: Colors.grey[400], fontSize: 14),
+          ),
+        ],
+      ),
     );
   }
 
