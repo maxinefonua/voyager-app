@@ -1,23 +1,24 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:voyager/core/flight_search_state.dart';
 import 'package:voyager/models/airport/airport.dart';
 import 'package:voyager/services/country_service.dart';
 
-class NearbyDialog extends StatefulWidget {
+class NearbyIncludeState extends StatefulWidget {
   final bool isDeparture;
   final CountryService countryService;
-  const NearbyDialog({
+  const NearbyIncludeState({
     super.key,
     required this.isDeparture,
     required this.countryService,
   });
 
   @override
-  State<NearbyDialog> createState() => _NearbyDialogState();
+  State<NearbyIncludeState> createState() => _NearbyIncludeStateState();
 }
 
-class _NearbyDialogState extends State<NearbyDialog> {
+class _NearbyIncludeStateState extends State<NearbyIncludeState> {
   final ValueNotifier<Set<String>> selectedOrigins = ValueNotifier<Set<String>>(
     {},
   );
@@ -31,7 +32,6 @@ class _NearbyDialogState extends State<NearbyDialog> {
   @override
   void initState() {
     super.initState();
-
     // Get initial selections from searchState
     final searchState = context.read<FlightSearchState>();
     _initialOrigins = Set<String>.from(
@@ -65,108 +65,54 @@ class _NearbyDialogState extends State<NearbyDialog> {
       nearbyOrigins = searchState.nearbyDestinationAirports;
       nearbyDestinations = searchState.nearbyDepartureAirports;
     }
-
-    return AlertDialog(
-      contentPadding: EdgeInsets.zero,
-      content: SizedBox(
-        width: double.maxFinite,
-        height: 500,
-        child: DefaultTabController(
-          length: 2,
-          child: Column(
-            children: [
-              SizedBox(height: 16),
-              Text('Include Nearby Airports'),
-              // Tab Bar
-              Container(
-                color: Colors.white,
-                child: TabBar(
-                  labelColor: Colors.blue,
-                  unselectedLabelColor: Colors.grey,
-                  indicatorColor: Colors.blue,
-                  tabs: [
-                    Tab(text: origin.iata),
-                    Tab(text: destination.iata),
-                  ],
-                ),
-              ),
-
-              // Tab Content
-              Expanded(
-                child: TabBarView(
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          _buildHeader(searchState),
+          // Tab Bar
+          _buildTabBar(origin.iata, destination.iata),
+          // Tab Content
+          Expanded(
+            child: TabBarView(
+              children: [
+                // First tab content
+                Column(
                   children: [
-                    // First tab content
-                    Column(
-                      children: [
-                        // ListView
-                        Expanded(
-                          child: _buildAirportsList(
-                            widget.isDeparture,
-                            nearbyOrigins.skip(1).toList(),
-                            origin,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Second tab content
-                    Column(
-                      children: [
-                        Expanded(
-                          child: _buildAirportsList(
-                            !widget.isDeparture,
-                            nearbyDestinations.skip(1).toList(),
-                            destination,
-                          ),
-                        ),
-                      ],
+                    Divider(height: 0),
+                    _buildAirportHeader(origin),
+                    Divider(height: 0),
+                    Expanded(
+                      child: _buildAirportsList(
+                        widget.isDeparture,
+                        nearbyOrigins.skip(1).toList(),
+                        origin,
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
+
+                // Second tab content
+                Column(
+                  children: [
+                    Divider(height: 0),
+                    _buildAirportHeader(destination),
+                    Divider(height: 0),
+                    Expanded(
+                      child: _buildAirportsList(
+                        !widget.isDeparture,
+                        nearbyDestinations.skip(1).toList(),
+                        destination,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            // Check if there are any changes
-            final hasChanges =
-                !_setsAreEqual(selectedOrigins.value, _initialOrigins) ||
-                !_setsAreEqual(
-                  selectedDestinations.value,
-                  _initialDestinations,
-                );
-
-            if (hasChanges) {
-              if (widget.isDeparture) {
-                searchState.updateSearch(
-                  addDepartureCodes: selectedOrigins.value,
-                  addDestinationCodes: selectedDestinations.value,
-                );
-              } else {
-                searchState.updateSearch(
-                  addDepartureCodes: selectedDestinations.value,
-                  addDestinationCodes: selectedOrigins.value,
-                );
-              }
-            }
-            Navigator.pop(context);
-          },
-          child: Text('Confirm'),
-        ),
-      ],
     );
-  }
-
-  // Helper function to compare sets
-  bool _setsAreEqual<T>(Set<T> set1, Set<T> set2) {
-    if (set1.length != set2.length) return false;
-    for (final element in set1) {
-      if (!set2.contains(element)) return false;
-    }
-    return true;
   }
 
   Widget _buildAirportsList(
@@ -280,5 +226,155 @@ class _NearbyDialogState extends State<NearbyDialog> {
       );
     }
     return sb.toString();
+  }
+
+  Widget _buildHeader(FlightSearchState searchState) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.grey[300]!)),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
+          SizedBox(width: 8),
+          Text(
+            'Nearby Airports',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
+          Spacer(),
+          ElevatedButton(
+            onPressed: () => _handleSaved(searchState, context),
+            child: Text('Save'),
+          ),
+          SizedBox(width: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabBar(String originCode, String desinationCode) {
+    return Container(
+      color: Colors.white,
+      child: TabBar(
+        labelColor: Colors.blue,
+        unselectedLabelColor: Colors.grey,
+        indicatorColor: Colors.blue,
+        tabs: [
+          Tab(text: originCode),
+          Tab(text: desinationCode),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAirportHeader(Airport airport) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.blue[100]!, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withAlpha(5),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              width: 4,
+              height: 60,
+              decoration: BoxDecoration(
+                color: Colors.blue[500],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    airport.name,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    '${airport.city}, ${airport.subdivision}',
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 16),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                airport.iata,
+                style: TextStyle(
+                  color: Colors.blue[700],
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleSaved(FlightSearchState searchState, BuildContext context) {
+    final currentOrigins = selectedOrigins.value;
+    final currentDestinations = selectedDestinations.value;
+
+    // Check if any changes were made
+    final originsChanged = !setEquals(currentOrigins, _initialOrigins);
+    final destinationsChanged = !setEquals(
+      currentDestinations,
+      _initialDestinations,
+    );
+
+    // If no changes, just close
+    if (!originsChanged && !destinationsChanged) {
+      Navigator.pop(context);
+      return;
+    }
+
+    if (originsChanged && destinationsChanged) {
+      // Both changed
+      searchState.updateSearch(
+        addDepartureCodes: currentOrigins,
+        addDestinationCodes: currentDestinations,
+      );
+    } else if (originsChanged) {
+      // Only origins changed
+      searchState.updateSearch(addDepartureCodes: currentOrigins);
+    } else if (destinationsChanged) {
+      // Only destinations changed
+      searchState.updateSearch(addDestinationCodes: currentDestinations);
+    }
+
+    // Always close the screen after saving
+    Navigator.pop(context);
   }
 }

@@ -52,7 +52,6 @@ class _PathTileState extends State<PathTile>
     super.initState();
     _isExpanded = widget.initiallyExpanded;
     _scrollController = ScrollController();
-    _scrollController.addListener(_onScroll);
     _expansionController = ExpansibleController(); // Initialize
   }
 
@@ -92,31 +91,9 @@ class _PathTileState extends State<PathTile>
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     _collapseNotifier.removeListener(_onCollapseRequested);
     super.dispose();
-  }
-
-  void _onScroll() {
-    if (!_isExpanded) return;
-
-    final threshold = 50.0;
-    final position = _scrollController.position;
-
-    // Optional: Show a snackbar or hint when near bottom
-    if (position.pixels >= position.maxScrollExtent - threshold) {
-      // Optional: Show a hint that releasing will collapse
-      Future.microtask(() {
-        if (mounted && widget.isEnabled && _isExpanded) {
-          // You could show a snackbar or other UI hint here
-          setState(() {
-            _isExpanded = false;
-          });
-          _expansionController.collapse();
-        }
-      });
-    }
   }
 
   void _toggleExpansion(bool expanded) {
@@ -161,6 +138,12 @@ class _PathTileState extends State<PathTile>
     final calculatedHeaderHeight = titleHeight + subtitleHeight + paddingHeight;
 
     return ExpansionTile(
+      shape: Border(),
+      collapsedShape: BoxBorder.fromLTRB(
+        bottom: BorderSide(width: 1, color: Theme.of(context).dividerColor),
+      ),
+      visualDensity: VisualDensity(vertical: -4),
+      childrenPadding: EdgeInsets.zero, // Remove children padding
       controller: _expansionController,
       initiallyExpanded: _isExpanded,
       onExpansionChanged: _toggleExpansion,

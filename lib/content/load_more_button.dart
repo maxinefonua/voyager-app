@@ -8,7 +8,6 @@ class LoadMoreButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('build LoadMoreButton isDeparture: $isDeparture');
     final searchState = context.watch<FlightSearchState>();
     if (searchState.isUpdating) {
       return _buildDisabledLoadButton();

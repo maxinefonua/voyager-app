@@ -97,14 +97,12 @@ class PathResultsState extends State<PathResults> {
       return _buildLoadingIndicator();
     }
 
-    debugPrint('PathResults build with ${paths.length} paths');
     final airportCache = context.read<AirportCache>();
     final timezoneService = context.read<TimezoneService>();
 
     return Expanded(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          debugPrint('Available height: ${constraints.maxHeight}');
           return Stack(
             children: [
               if (paths.length > 1)
@@ -117,7 +115,12 @@ class PathResultsState extends State<PathResults> {
                     final List<Airport> airportList = path.iataList
                         .map((iata) => airportCache.getAirport(iata)!)
                         .toList();
-                    final subtitle = _buildSubtitle(path, airportList);
+                    final subtitle = _buildSubtitle(
+                      path,
+                      airportList,
+                      searchState.departureAirport!.iata,
+                      searchState.destinationAirport!.iata,
+                    );
                     Map<String, Airport> airportMap = {};
                     for (String iata in path.iataList) {
                       airportMap[iata] = airportCache.getAirport(iata)!;
@@ -134,7 +137,8 @@ class PathResultsState extends State<PathResults> {
                       timezoneService: timezoneService,
                       subtitle: subtitle,
                       pathDisplay: path.displayText,
-                      initiallyExpanded: index == 0,
+                      initiallyExpanded:
+                          index == 0 && localizedFlights.isNotEmpty,
                       constrainList: paths.length > 1,
                       key: ValueKey('path_${path.hashCode}_$index'),
                       isDepartureTile: _isDeparture,
@@ -149,7 +153,12 @@ class PathResultsState extends State<PathResults> {
                     final List<Airport> airportList = path.iataList
                         .map((iata) => airportCache.getAirport(iata)!)
                         .toList();
-                    final subtitle = _buildSubtitle(path, airportList);
+                    final subtitle = _buildSubtitle(
+                      path,
+                      airportList,
+                      searchState.departureAirport!.iata,
+                      searchState.destinationAirport!.iata,
+                    );
                     Map<String, Airport> airportMap = {};
                     for (String iata in path.iataList) {
                       airportMap[iata] = airportCache.getAirport(iata)!;
@@ -207,16 +216,32 @@ class PathResultsState extends State<PathResults> {
     );
   }
 
-  String _buildSubtitle(PathDetailed path, List<Airport> airportList) {
+  String _buildSubtitle(
+    PathDetailed path,
+    List<Airport> airportList,
+    String departureCode,
+    String destinationCode,
+  ) {
     if (path.iataList.length == 2) {
+      final sb = StringBuffer();
       if (path.flightPathList.isEmpty) {
-        return 'No direct flights';
+        sb.write('No direct flights');
       } else {
         if (path.flightPathList.length == 1) {
-          return '${path.flightPathList.length} direct flight';
+          sb.write('${path.flightPathList.length} direct flight');
+        } else {
+          sb.write('${path.flightPathList.length} direct flights');
         }
-        return '${path.flightPathList.length} direct flights';
       }
+      if ((widget.isDeparture && path.pathOrigin != departureCode) ||
+          (!widget.isDeparture && path.pathOrigin != destinationCode)) {
+        sb.write(' from ${airportList.first.city}');
+      }
+      if ((widget.isDeparture && path.pathDestination != destinationCode) ||
+          (!widget.isDeparture && path.pathDestination != departureCode)) {
+        sb.write(' to ${airportList.last.city}');
+      }
+      return sb.toString();
     } else {
       final midAirportCities = airportList
           .sublist(1, airportList.length - 1)

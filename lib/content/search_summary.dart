@@ -24,12 +24,12 @@ class SearchSummaryContent extends StatelessWidget {
       destination = searchState.departureAirport!;
     }
 
-    return Padding(
-      padding: EdgeInsetsGeometry.all(10),
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsetsGeometry.symmetric(vertical: 16, horizontal: 16),
       child: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _buildAirportBadge(isDeparture, origin),
               SizedBox(width: 12),
@@ -38,6 +38,7 @@ class SearchSummaryContent extends StatelessWidget {
               _buildAirportBadge(!isDeparture, destination),
             ],
           ),
+          SizedBox(height: 5),
           AirportDetailsButton(
             isDeparture: isDeparture,
             countryService: countryService,
@@ -75,6 +76,7 @@ class SearchSummaryContent extends StatelessWidget {
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       textAlign: TextAlign.center,
+      style: TextStyle(fontSize: 16),
     );
   }
 }
