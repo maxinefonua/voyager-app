@@ -35,7 +35,6 @@ class AirportCache {
             '$allParams&airline=${Airline.values.map((value) => value.name).join(',')}';
       }
       final String url = '$nearbyAirportsPath?$allParams';
-      debugPrint('fetch nearby airports at $url');
       final response = await http.get(
         Uri.parse(url),
         headers: {voyagerAuthHeader: voyagerAuthToken},
@@ -80,7 +79,6 @@ class AirportCache {
     if (!_isInitialized) {
       throw StateError('AirportsCache must be initialized first');
     }
-    debugPrint('Cache returning ${_airportsCache.length} airports'); // Debug
     return _airportsCache.values.toList();
   }
 

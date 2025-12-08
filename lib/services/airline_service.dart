@@ -15,7 +15,6 @@ class AirlineService {
       String destinationParam = destinationList.join(',');
       String allParams = 'origin=$originParam&destination=$destinationParam';
       final String url = '$airlinePath?$allParams';
-      debugPrint('fetch airlines at $url');
       final response = await http.get(
         Uri.parse(url),
         headers: {voyagerAuthHeader: voyagerAuthToken},

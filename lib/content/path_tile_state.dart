@@ -13,10 +13,11 @@ class PathTile extends StatefulWidget {
   final String pathDisplay;
   final String subtitle;
   final bool initiallyExpanded;
-  final bool constrainList;
+  final VoidCallback? onExpanded;
   final bool isDepartureTile;
-  final double? height;
+  final double height;
   final bool isEnabled;
+  final bool isLast;
   const PathTile({
     super.key,
     required this.localizedFlights,
@@ -24,11 +25,12 @@ class PathTile extends StatefulWidget {
     required this.timezoneService,
     required this.pathDisplay,
     required this.subtitle,
+    required this.onExpanded,
     required this.initiallyExpanded,
-    required this.constrainList,
-    this.height,
+    required this.height,
     required this.isDepartureTile,
     required this.isEnabled,
+    required this.isLast,
   });
 
   @override
@@ -40,17 +42,16 @@ class _PathTileState extends State<PathTile>
   @override
   bool get wantKeepAlive => true;
   late bool _isExpanded;
+  late VoidCallback? _onExpanded;
   late final ScrollController _scrollController;
   late ValueNotifier<bool> _collapseNotifier;
-  late ExpansibleController _expansionController; // Add this
-
-  PageStorageKey get _listKey =>
-      PageStorageKey('path_tile_${widget.pathDisplay}');
+  late ExpansibleController _expansionController;
 
   @override
   void initState() {
     super.initState();
-    _isExpanded = widget.initiallyExpanded;
+    _isExpanded = widget.isEnabled ? widget.initiallyExpanded : false;
+    _onExpanded = widget.onExpanded;
     _scrollController = ScrollController();
     _expansionController = ExpansibleController(); // Initialize
   }
@@ -97,16 +98,24 @@ class _PathTileState extends State<PathTile>
   }
 
   void _toggleExpansion(bool expanded) {
+    if (!widget.isEnabled) {
+      if (_isExpanded) {
+        setState(() {
+          _isExpanded = false;
+        });
+        _expansionController.collapse();
+      }
+      return;
+    }
+
     setState(() {
       _isExpanded = expanded;
     });
-
     if (expanded) {
       _expansionController.expand();
-      // Scroll to top when expanding
-      Future.microtask(() {
-        if (_scrollController.hasClients) {
-          _scrollController.jumpTo(0);
+      Future.delayed(const Duration(milliseconds: 350), () {
+        if (_onExpanded != null) {
+          _onExpanded!();
         }
       });
     } else {
@@ -152,19 +161,17 @@ class _PathTileState extends State<PathTile>
       enabled: widget.isEnabled,
       title: Text(widget.pathDisplay),
       subtitle: Text(widget.subtitle),
-      children: widget.height == null
+      children: widget.isLast
           ? [
-              ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: 300),
-                child: _buildFlightPathList(_listKey),
+              SizedBox(
+                height: widget.height - calculatedHeaderHeight,
+                child: _buildFlightPathList(),
               ),
             ]
           : [
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: widget.height! - calculatedHeaderHeight,
-                ),
-                child: _buildFlightPathList(_listKey),
+              SizedBox(
+                height: widget.height - 1.75 * calculatedHeaderHeight,
+                child: _buildFlightPathList(),
               ),
             ],
     );
@@ -179,9 +186,8 @@ class _PathTileState extends State<PathTile>
     return textPainter.height;
   }
 
-  ListView _buildFlightPathList(PageStorageKey? key) {
+  ListView _buildFlightPathList() {
     return ListView.builder(
-      key: key,
       shrinkWrap: true,
       controller: _scrollController,
       physics: const ClampingScrollPhysics(),

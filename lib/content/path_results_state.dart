@@ -20,6 +20,7 @@ class PathResultsState extends State<PathResults> {
   final _scrollController = ScrollController();
   late final bool _isDeparture;
   bool _isNavigatingBack = false;
+  final Map<String, GlobalKey> _tileKeys = {};
 
   @override
   void initState() {
@@ -46,6 +47,29 @@ class PathResultsState extends State<PathResults> {
         _scrollController.position.maxScrollExtent) {
       _loadMore();
     }
+  }
+
+  void _scrollToExpandedTile(String pathKey) {
+    // Check if key exists in the map
+    if (!_tileKeys.containsKey(pathKey)) {
+      debugPrint('Warning: Key $pathKey not found in tileKeys map');
+      debugPrint('Available keys: ${_tileKeys.keys}');
+      return;
+    }
+
+    final key = _tileKeys[pathKey];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (key?.currentContext != null) {
+        Scrollable.ensureVisible(
+          key!.currentContext!,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          alignment: 0.0,
+        );
+      } else {
+        debugPrint('Warning: Key context is null for $pathKey');
+      }
+    });
   }
 
   Future<void> handleBackButton() async {
@@ -82,23 +106,30 @@ class PathResultsState extends State<PathResults> {
     }
   }
 
+  String _generatePathKey(PathDetailed path, int index) {
+    return '${path.hashCode}_${path.displayText}_$index';
+  }
+
   @override
   Widget build(BuildContext context) {
     final searchState = context.watch<FlightSearchState>();
-    final paths = _isDeparture
+
+    final List<PathDetailed>? paths = _isDeparture
         ? searchState.departurePaths
-        : searchState.returnPaths!;
+        : searchState.returnPaths;
+
     final isUpdating = _isDeparture
         ? searchState.isUpdatingDeparture
         : searchState.isUpdatingReturn;
 
-    // Show initial loading only when there are originally no paths
-    if (paths.isEmpty) {
+    // Show loading indicator when paths is null or empty
+    if (paths == null || paths.isEmpty) {
       return _buildLoadingIndicator();
     }
 
     final airportCache = context.read<AirportCache>();
     final timezoneService = context.read<TimezoneService>();
+    bool firstNonEmptySet = false;
 
     return Expanded(
       child: LayoutBuilder(
@@ -109,9 +140,16 @@ class PathResultsState extends State<PathResults> {
                 ListView.builder(
                   controller: _scrollController,
                   addAutomaticKeepAlives: true,
-                  itemCount: paths.length,
+                  itemCount: paths.length + 1,
                   itemBuilder: (context, index) {
+                    if (index >= paths.length) {
+                      return SizedBox(height: 20);
+                    }
                     final path = paths[index];
+                    final String pathKey = _generatePathKey(path, index);
+                    if (!_tileKeys.containsKey(pathKey)) {
+                      _tileKeys[pathKey] = GlobalKey();
+                    }
                     final List<Airport> airportList = path.iataList
                         .map((iata) => airportCache.getAirport(iata)!)
                         .toList();
@@ -130,6 +168,11 @@ class PathResultsState extends State<PathResults> {
                       timezoneService,
                       airportMap,
                     );
+                    bool initiallyExpand = false;
+                    if (localizedFlights.isNotEmpty && !firstNonEmptySet) {
+                      initiallyExpand = true;
+                      firstNonEmptySet = true;
+                    }
 
                     return PathTile(
                       localizedFlights: localizedFlights,
@@ -137,12 +180,13 @@ class PathResultsState extends State<PathResults> {
                       timezoneService: timezoneService,
                       subtitle: subtitle,
                       pathDisplay: path.displayText,
-                      initiallyExpanded:
-                          index == 0 && localizedFlights.isNotEmpty,
-                      constrainList: paths.length > 1,
-                      key: ValueKey('path_${path.hashCode}_$index'),
+                      initiallyExpanded: initiallyExpand,
+                      key: _tileKeys[pathKey],
                       isDepartureTile: _isDeparture,
                       isEnabled: localizedFlights.isNotEmpty,
+                      onExpanded: () => _scrollToExpandedTile(pathKey),
+                      height: constraints.maxHeight,
+                      isLast: index == paths.length - 1,
                     );
                   },
                 ),
@@ -150,6 +194,10 @@ class PathResultsState extends State<PathResults> {
                 Builder(
                   builder: (context) {
                     final path = paths[0];
+                    final String pathKey = _generatePathKey(path, 0);
+                    if (!_tileKeys.containsKey(pathKey)) {
+                      _tileKeys[pathKey] = GlobalKey();
+                    }
                     final List<Airport> airportList = path.iataList
                         .map((iata) => airportCache.getAirport(iata)!)
                         .toList();
@@ -176,11 +224,12 @@ class PathResultsState extends State<PathResults> {
                       subtitle: subtitle,
                       pathDisplay: path.displayText,
                       initiallyExpanded: true,
-                      constrainList: paths.length > 1,
-                      key: ValueKey('path_${path.hashCode}_0'),
+                      onExpanded: () => _scrollToExpandedTile(pathKey),
+                      key: _tileKeys[pathKey],
                       height: constraints.maxHeight,
                       isDepartureTile: _isDeparture,
-                      isEnabled: false,
+                      isEnabled: localizedFlights.isNotEmpty,
+                      isLast: true,
                     );
                   },
                 ),

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:timezone/browser.dart' as tz;
 import 'package:voyager/services/timezone/timezone_service_interface.dart';
 import 'package:voyager/utils/date_time_extensions.dart';
@@ -5,11 +6,20 @@ import 'package:voyager/utils/format.dart';
 
 class WebTimezoneService implements TimezoneService {
   bool _initialized = false;
-
   @override
   Future<void> initialize() async {
     if (!_initialized) {
-      tz.initializeTimeZone();
+      debugPrint('🌐 Initializing WebTimezoneService...');
+
+      try {
+        await tz.initializeTimeZone('assets/packages/timezone/data/latest.tzf');
+        debugPrint('🎯 Timezone initialized from network');
+      } catch (e) {
+        debugPrint(e.toString());
+        debugPrintStack();
+        rethrow;
+      }
+
       _initialized = true;
     }
   }

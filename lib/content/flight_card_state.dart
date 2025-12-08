@@ -65,9 +65,6 @@ class _FlightPathCardState extends State<FlightPathCard>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    debugPrint(
-      'FlightPathCard BUILD: ${widget.flightPath.first.origin}-${widget.flightPath.last.destination}',
-    );
     return Card(
       margin: _flightPath.length > 2
           ? EdgeInsets.all(16.0)

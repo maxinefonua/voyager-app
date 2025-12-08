@@ -90,7 +90,6 @@ class PathService {
         break;
       }
       if (freshBatch.content.isNotEmpty) {
-        debugPrint('fetched non-empty batch after $retries retries');
         break;
       }
       final delayMs = 100 * (1 << (retries - 1)).clamp(100, 5000);
@@ -142,7 +141,6 @@ class PathService {
     try {
       String allParams = _buildParams(pathRequest);
       final String url = '$pathPath?$allParams';
-      debugPrint('fetch first paths at $url');
       final response = await http.get(
         Uri.parse(url),
         headers: {voyagerAuthHeader: voyagerAuthToken},
@@ -181,7 +179,6 @@ class PathService {
       String allParams = _buildParams(pathRequest);
       allParams = '$allParams&skip=$skip';
       final String url = '$pathPath?$allParams';
-      debugPrint('fetch next paths at $url');
       final response = await http.get(
         Uri.parse(url),
         headers: {voyagerAuthHeader: voyagerAuthToken},
