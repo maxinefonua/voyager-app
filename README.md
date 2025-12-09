@@ -14,8 +14,8 @@ This application was built with the following minimum objectives:
 
 ### Project Repos:
 - Voyager App: https://github.com/maxinefonua/voyager-app
-    - Flutter project for web UI and future mobile apps
-    - custom responsive widgets and animation
+  - Flutter project for cross-platform apps
+  - custom responsive widgets and animation
 - Voyager API: https://github.com/maxinefonua/voyager-api
     - standalone backend services
     - caching, request limits, auth tokens
