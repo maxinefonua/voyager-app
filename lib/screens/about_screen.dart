@@ -155,7 +155,7 @@ class AboutScaffold extends StatelessWidget {
           'Source Code',
           'GitHub Repository',
           Icons.code,
-          'https://github.com/maxinefonua/voyager-ui',
+          'https://github.com/maxinefonua/voyager-app',
         ),
       ],
     );
@@ -191,8 +191,7 @@ class AboutScaffold extends StatelessWidget {
                 final Uri url = Uri.parse(urlToLaunch);
                 if (!await launchUrl(
                   url,
-                  mode: LaunchMode
-                      .externalApplication, // This opens in default browser
+                  mode: LaunchMode.externalApplication,
                 )) {
                   throw Exception('Could not launch $url');
                 }
