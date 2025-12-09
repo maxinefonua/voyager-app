@@ -1,4 +1,4 @@
-# <img src="/assets/images/logo.svg" width="30"> Voyager Web Application
+# <img src="/assets/icons/logo.svg" width="30"> Voyager Web Application
 
 ### https://demo.voyagerapp.org
 A personal project I took on as a referesher of full-cycle development, and to optimize my flying benefits as an airline employee. Built entirely on open-sourced data and frameworks.
