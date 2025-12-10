@@ -8,10 +8,10 @@ class AboutScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('About')),
+      appBar: AppBar(title: Text('About'), backgroundColor: Colors.blue),
       body: Stack(
         children: [
-          _buildBackgroundFill(),
+          _buildBackgroundFill(context),
           ListView(
             padding: EdgeInsets.all(16),
             children: [
@@ -45,9 +45,17 @@ class AboutScaffold extends StatelessWidget {
     );
   }
 
-  Widget _buildBackgroundFill() {
+  Widget _buildBackgroundFill(BuildContext context) {
     return Positioned.fill(
-      child: LogoSvg(size: 240, color: Colors.blue.withAlpha(10)),
+      child: Padding(
+        padding: EdgeInsetsGeometry.symmetric(horizontal: 8),
+        child: LogoSvg(
+          size: 240,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Theme.of(context).primaryColor
+              : Colors.blue.withAlpha(10),
+        ),
+      ),
     );
   }
 
@@ -85,13 +93,13 @@ class AboutScaffold extends StatelessWidget {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.blue.withAlpha(25),
+            color: Colors.blue,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             'Beta',
             style: TextStyle(
-              color: Theme.of(context).primaryColor,
+              color: Colors.white,
               fontWeight: FontWeight.w500,
               fontSize: 12,
             ),
@@ -103,8 +111,8 @@ class AboutScaffold extends StatelessWidget {
 
   Widget _buildVoyagerContent(BuildContext context) {
     return Text(
-      'Enhances airline employee flight search with exhaustive route paths via interairline travel and nearby airport suggestions.',
-      style: TextStyle(fontSize: 15, color: Colors.grey[700], height: 1.5),
+      'Enhancing the flight search experience with exhaustive route paths and nearby airport suggestions.',
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.5),
     );
   }
 
@@ -168,6 +176,7 @@ class AboutScaffold extends StatelessWidget {
     IconData iconData,
     String urlToLaunch,
   ) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return ListTile(
       leading: Container(
         width: 40,
@@ -176,7 +185,7 @@ class AboutScaffold extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).shadowColor.withAlpha(40),
+              color: Theme.of(context).shadowColor.withAlpha(20),
               blurRadius: 2,
               offset: Offset(0, 2),
             ),
@@ -184,7 +193,7 @@ class AboutScaffold extends StatelessWidget {
         ),
         child: ClipOval(
           child: Material(
-            color: Theme.of(context).cardColor,
+            color: isDarkMode ? Colors.grey[50] : Theme.of(context).cardColor,
             child: InkWell(
               onTap: () async {
                 await Future.delayed(Duration(milliseconds: 150));
@@ -196,8 +205,8 @@ class AboutScaffold extends StatelessWidget {
                   throw Exception('Could not launch $url');
                 }
               },
-              splashColor: Theme.of(context).primaryColor.withAlpha(50),
-              child: Icon(iconData, color: Theme.of(context).primaryColor),
+              splashColor: Colors.blue.withAlpha(50),
+              child: Icon(iconData, color: Colors.blue),
             ),
           ),
         ),

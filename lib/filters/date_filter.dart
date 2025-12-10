@@ -21,7 +21,7 @@ class DateFilter extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border.symmetric(
-          horizontal: BorderSide(color: Colors.grey[300]!),
+          horizontal: BorderSide(color: Theme.of(context).dividerColor),
         ),
       ),
       child: Row(
@@ -52,11 +52,7 @@ class DateFilter extends StatelessWidget {
               SizedBox(width: 8),
               Text(
                 formatDate(onDate),
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[700],
-                  fontWeight: FontWeight.w500,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -86,7 +82,7 @@ class DateFilter extends StatelessWidget {
   }) {
     return IconButton(
       onPressed: onPressed,
-      icon: Icon(icon, color: Colors.grey[700]),
+      icon: Icon(icon),
       iconSize: 20,
       padding: EdgeInsets.all(8),
       constraints: BoxConstraints(minWidth: 44, minHeight: 44),

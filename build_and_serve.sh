@@ -60,12 +60,12 @@ main() {
         exit 1
     fi
     
-    # Step 4: Build for web
-    print_message "Building for web..."
-    if flutter build web; then
-        print_success "Web build completed successfully"
+    # Step 4: Build for web release
+    print_message "Building for web release..."
+    if flutter build web --release; then
+        print_success "Web release build completed successfully"
     else
-        print_error "Failed to build for web"
+        print_error "Failed to build for web release"
         exit 1
     fi
     
@@ -89,7 +89,7 @@ main() {
     fi
     
     # Step 8: Serve the web app
-    print_success "Starting HTTP server on http://localhost:8080"
+    print_success "Starting HTTP server on http://localhost:3000"
     print_warning "Press Ctrl+C to stop the server"
     echo ""
     print_message "Opening browser in 3 seconds..."
@@ -98,17 +98,17 @@ main() {
     # Try to open the browser (cross-platform)
     if command -v xdg-open &> /dev/null; then
         # Linux
-        xdg-open "http://localhost:8080" &
+        xdg-open "http://localhost:3000" &
     elif command -v open &> /dev/null; then
         # macOS
-        open "http://localhost:8080" &
+        open "http://localhost:3000" &
     elif command -v start &> /dev/null; then
         # Windows (if using Git Bash or WSL)
-        start "http://localhost:8080" &
+        start "http://localhost:3000" &
     fi
     
     # Start the HTTP server
-    python3 -m http.server 8080
+    python3 -m http.server 3000
 }
 
 # Run the main function

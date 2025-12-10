@@ -9,17 +9,15 @@ class WebTimezoneService implements TimezoneService {
   @override
   Future<void> initialize() async {
     if (!_initialized) {
-      debugPrint('🌐 Initializing WebTimezoneService...');
-
       try {
         await tz.initializeTimeZone('assets/packages/timezone/data/latest.tzf');
-        debugPrint('🎯 Timezone initialized from network');
       } catch (e) {
-        debugPrint(e.toString());
+        debugPrint(
+          'failed to initialize WebTimezoneService with message: ${e.toString()}',
+        );
         debugPrintStack();
         rethrow;
       }
-
       _initialized = true;
     }
   }

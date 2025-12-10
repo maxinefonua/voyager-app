@@ -68,7 +68,7 @@ class AirlineOptionList extends StatelessWidget {
           onChanged: onAirlineSelected,
           child: Column(
             children: [
-              _buildAllAirlinesOption(key: allAirlinesKey),
+              _buildAllAirlinesOption(key: allAirlinesKey, context: context),
               Divider(height: 0),
               if (searchQuery.isNotEmpty && filteredAirlines.isEmpty)
                 Expanded(child: _buildNoResults()),
@@ -83,7 +83,11 @@ class AirlineOptionList extends StatelessWidget {
                         final key = GlobalKey();
                         airlineKeys[airline] =
                             key; // Store key for this airline
-                        return _buildAirlineOption(airline, key: key);
+                        return _buildAirlineOption(
+                          airline: airline,
+                          key: key,
+                          context: context,
+                        );
                       }),
                     ],
                   ),
@@ -96,7 +100,11 @@ class AirlineOptionList extends StatelessWidget {
     );
   }
 
-  Widget _buildAirlineOption(Airline airline, {GlobalKey? key}) {
+  Widget _buildAirlineOption({
+    GlobalKey? key,
+    required Airline airline,
+    required BuildContext context,
+  }) {
     final isEnabled = enabledAirlines?.contains(airline) ?? true;
     return Material(
       color: Colors.transparent,
@@ -104,7 +112,9 @@ class AirlineOptionList extends StatelessWidget {
         onTap: isEnabled ? () => onAirlineSelected(airline) : null,
         borderRadius: BorderRadius.circular(8),
         child: Container(
-          color: airline == selectedAirline ? Colors.grey[100] : null,
+          color: airline == selectedAirline
+              ? Theme.of(context).dividerColor.withAlpha(10)
+              : null,
           child: ListTile(
             key: key,
             enabled: isEnabled,
@@ -112,26 +122,30 @@ class AirlineOptionList extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: isEnabled ? Colors.blue[50] : Colors.grey[50],
+                color: isEnabled
+                    ? Colors.blue.withAlpha(35)
+                    : Theme.of(context).disabledColor.withAlpha(10),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 Icons.airlines,
                 size: 20,
-                color: isEnabled ? Colors.blue[500] : Colors.grey[400],
+                color: isEnabled
+                    ? Colors.blue.withAlpha(200)
+                    : Theme.of(context).disabledColor.withAlpha(50),
               ),
             ),
             title: Text(
               airline.displayText,
               style: TextStyle(
                 fontSize: 16,
-                color: isEnabled ? Colors.grey[800] : Colors.grey[400],
                 fontWeight: isEnabled ? FontWeight.w500 : FontWeight.normal,
               ),
             ),
             trailing: Radio<Airline?>(
               enabled: isEnabled,
               value: airline,
+              activeColor: Colors.blue,
               toggleable: true,
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 16),
@@ -141,24 +155,29 @@ class AirlineOptionList extends StatelessWidget {
     );
   }
 
-  Widget _buildAllAirlinesOption({GlobalKey? key}) {
+  Widget _buildAllAirlinesOption({
+    GlobalKey? key,
+    required BuildContext context,
+  }) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () => onAirlineSelected(null),
         borderRadius: BorderRadius.circular(8),
         child: Container(
-          color: selectedAirline == null ? Colors.grey[100] : null,
+          color: selectedAirline == null
+              ? Theme.of(context).dividerColor.withAlpha(10)
+              : null,
           child: ListTile(
             title: Text(
               'Multi-Airline',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[800],
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
-            trailing: Radio<Airline?>(value: null, toggleable: true),
+            trailing: Radio<Airline?>(
+              value: null,
+              toggleable: true,
+              activeColor: Colors.blue,
+            ),
             contentPadding: EdgeInsets.symmetric(horizontal: 16),
           ),
         ),

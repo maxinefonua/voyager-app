@@ -156,7 +156,9 @@ class _PathTileState extends State<PathTile>
       controller: _expansionController,
       initiallyExpanded: _isExpanded,
       onExpansionChanged: _toggleExpansion,
-      collapsedBackgroundColor: widget.isEnabled ? Colors.white : null,
+      collapsedBackgroundColor: widget.isEnabled
+          ? Theme.of(context).listTileTheme.tileColor
+          : null,
       clipBehavior: Clip.none,
       enabled: widget.isEnabled,
       title: Text(widget.pathDisplay),

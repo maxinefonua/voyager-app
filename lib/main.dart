@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:voyager/controllers/expansion_state_controller.dart';
 import 'package:voyager/core/flight_search_state.dart';
 import 'package:voyager/layout/responsive_layout.dart';
+import 'package:voyager/screens/splash_screen.dart';
 import 'package:voyager/services/airport_cache.dart';
 import 'package:voyager/services/country_service.dart';
 import 'package:voyager/services/path_service.dart';
@@ -11,7 +11,46 @@ import 'package:voyager/services/timezone/timezone_service.dart'
     show TimezoneService, createTimezoneService;
 
 void main() async {
-  await dotenv.load(fileName: ".env");
+  WidgetsFlutterBinding.ensureInitialized();
+
+  runApp(
+    MaterialApp(
+      theme: ThemeData(
+        useMaterial3: false,
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: false,
+        brightness: Brightness.dark,
+        primarySwatch: Colors.blue,
+      ),
+      themeMode: ThemeMode.system,
+      debugShowCheckedModeBanner: false,
+      home: SplashScreen(
+        duration: const Duration(seconds: 2),
+        child: FutureBuilder(
+          future: _initializeServices(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return MyApp(
+                countryService: snapshot.data!['countryService'],
+                airportCache: snapshot.data!['airportCache'],
+                timezoneService: snapshot.data!['timezoneService'],
+              );
+            }
+            // You can show a different loading screen here if needed
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.white),
+            );
+          },
+        ),
+      ),
+    ),
+  );
+}
+
+Future<Map<String, dynamic>> _initializeServices() async {
   final countryService = CountryService();
   await countryService.initialize();
   final airportCache = AirportCache();
@@ -19,13 +58,12 @@ void main() async {
   final timezoneService = createTimezoneService();
   await timezoneService.initialize();
   PathService.init(timezoneService);
-  runApp(
-    MyApp(
-      countryService: countryService,
-      airportCache: airportCache,
-      timezoneService: timezoneService,
-    ),
-  );
+
+  return {
+    'countryService': countryService,
+    'airportCache': airportCache,
+    'timezoneService': timezoneService,
+  };
 }
 
 class MyApp extends StatelessWidget {

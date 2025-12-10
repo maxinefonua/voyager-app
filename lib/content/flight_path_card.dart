@@ -59,7 +59,9 @@ class FlightPathCard extends StatelessWidget {
                                 padding: EdgeInsets.only(left: 10),
                                 child: Chip(
                                   label: Text('Airline change'),
-                                  backgroundColor: Colors.blue,
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).primaryColor,
                                   labelStyle: TextStyle(color: Colors.white),
                                 ),
                               ),
@@ -84,7 +86,9 @@ class FlightPathCard extends StatelessWidget {
                     'Arrives ${formatDay(flightPath.last.zonedDateTimeArrival, finalAirport.zoneId)} to ${finalAirport.city}',
                   ),
                   backgroundColor: Theme.of(context).hintColor,
-                  labelStyle: TextStyle(color: Colors.white),
+                  labelStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
                 ),
               ),
           ],
@@ -136,12 +140,12 @@ class FlightPathCard extends StatelessWidget {
         '${formatDuration(previousFlight.zonedDateTimeArrival, flight.zonedDateTimeDeparture)} layover',
       ),
       backgroundColor: layoverDuration.inHours == 0
-          ? Theme.of(context).colorScheme.error
-          : null,
+          ? Theme.of(context).colorScheme.errorContainer
+          : Theme.of(context).hintColor.withAlpha(10),
       labelStyle: TextStyle(
         color: layoverDuration.inHours == 0
             ? Theme.of(context).colorScheme.inversePrimary
-            : null,
+            : Theme.of(context).hintColor,
       ),
     );
   }

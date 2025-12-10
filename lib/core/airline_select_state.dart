@@ -140,7 +140,11 @@ class _AirlineSelectStateState extends State<AirlineSelectState> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Badge(
-        label: Text(disabledCount.toString()),
+        label: Text(
+          disabledCount.toString(),
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.amber,
         isLabelVisible: disabledCount > 0,
         child: TextButton.icon(
           onPressed: () {

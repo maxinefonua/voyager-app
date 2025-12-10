@@ -22,6 +22,7 @@ class ResponsiveAppbar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      backgroundColor: Colors.blue,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
@@ -31,10 +32,7 @@ class ResponsiveAppbar extends StatelessWidget implements PreferredSizeWidget {
             logoSvgString,
             width: 24,
             height: 24,
-            colorFilter: ColorFilter.mode(
-              Theme.of(context).scaffoldBackgroundColor,
-              BlendMode.srcIn,
-            ),
+            colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
           ),
           SizedBox(width: 12),
           Text(selectedTitle),

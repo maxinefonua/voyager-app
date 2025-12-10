@@ -36,6 +36,7 @@ class CountryService {
         throw Exception('Failed to load countries: ${response.body}');
       }
     } on http.ClientException catch (e) {
+      debugPrint('message: ${e.message}');
       throw Exception('Failed to load countries: $e');
     }
   }

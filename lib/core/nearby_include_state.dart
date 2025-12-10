@@ -71,7 +71,7 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
         children: [
           _buildHeader(searchState),
           // Tab Bar
-          _buildTabBar(origin.iata, destination.iata),
+          _buildTabBar(origin.iata, destination.iata, context),
           // Tab Content
           Expanded(
             child: TabBarView(
@@ -159,7 +159,6 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
                         '${airport.distance?.toStringAsFixed(1)} km from ${selectedAirport.iata}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[700],
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -182,6 +181,7 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
                 ),
               ),
               trailing: Checkbox(
+                activeColor: Colors.blue,
                 value: isSelected,
                 onChanged: (value) {
                   final newSet = Set<String>.from(selectedSet);
@@ -232,7 +232,9 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey[300]!)),
+        border: Border(
+          bottom: BorderSide(color: Theme.of(context).dividerColor),
+        ),
       ),
       child: Row(
         children: [
@@ -241,9 +243,19 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
             onPressed: () => Navigator.pop(context),
           ),
           SizedBox(width: 8),
-          Text(
-            'Nearby Airports',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Nearby Airports',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              SizedBox(height: 6),
+              Text(
+                'Save to add to flight search',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
           ),
           Spacer(),
           ElevatedButton(
@@ -256,9 +268,13 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
     );
   }
 
-  Widget _buildTabBar(String originCode, String desinationCode) {
+  Widget _buildTabBar(
+    String originCode,
+    String desinationCode,
+    BuildContext context,
+  ) {
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: TabBar(
         labelColor: Colors.blue,
         unselectedLabelColor: Colors.grey,
@@ -275,9 +291,8 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.blue[100]!, width: 2),
+        border: Border.all(color: Colors.blue, width: 2),
         boxShadow: [
           BoxShadow(
             color: Colors.blue.withAlpha(5),
@@ -294,7 +309,7 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
               width: 4,
               height: 60,
               decoration: BoxDecoration(
-                color: Colors.blue[500],
+                color: Colors.blue,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -314,9 +329,7 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
                   SizedBox(height: 4),
                   Text(
                     '${airport.city}, ${airport.subdivision}',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.copyWith(color: Colors.grey[700]),
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
               ),

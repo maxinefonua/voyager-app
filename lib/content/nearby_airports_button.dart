@@ -3,10 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:voyager/core/nearby_include_state.dart';
 import 'package:voyager/services/country_service.dart';
 
-class AirportDetailsButton extends StatelessWidget {
+class NearbyAirportsButton extends StatelessWidget {
   final bool isDeparture;
   final CountryService countryService;
-  const AirportDetailsButton({
+  const NearbyAirportsButton({
     super.key,
     required this.isDeparture,
     required this.countryService,
@@ -15,8 +15,12 @@ class AirportDetailsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final countryService = context.read<CountryService>();
-    return InputChip(
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    return ActionChip(
       elevation: 1,
+      backgroundColor: isDarkMode
+          ? Colors.grey[50]
+          : Theme.of(context).cardColor,
       onPressed: () {
         showModalBottomSheet(
           context: context,
@@ -25,7 +29,7 @@ class AirportDetailsButton extends StatelessWidget {
           builder: (context) => Container(
             height: MediaQuery.of(context).size.height * 0.9,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -41,28 +45,22 @@ class AirportDetailsButton extends StatelessWidget {
       label: RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
-          style: TextStyle(
-            fontSize: 12,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
           children: [
             TextSpan(
               text: 'ⓘ',
-              style: TextStyle(fontSize: 12, color: Colors.blue),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.blue),
             ),
             TextSpan(
               text: ' Nearby Airports',
-              style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.black),
             ),
           ],
         ),
       ),
-      backgroundColor: Colors.transparent,
-      selectedColor: Colors.blue[50],
-      shape: StadiumBorder(side: BorderSide(color: Colors.grey[300]!)),
     );
   }
 }

@@ -1,9 +1,8 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:voyager/models/airline/airline.dart';
 
-// Read from environment variables
-String get baseUrl => dotenv.get('BASE_URL');
-String get voyagerAuthToken => dotenv.get('VOYAGER_AUTH_TOKEN');
+String get baseUrl => "/api";
+// String get baseUrl => "http://localhost:8080";
+String get voyagerAuthToken => "dev_api_key";
 
 // Updated URLs using the getter
 String get airportsPathWithParams =>

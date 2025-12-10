@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:voyager/content/airport_details_button.dart';
+import 'package:voyager/content/nearby_airports_button.dart';
 import 'package:voyager/core/flight_search_state.dart';
 import 'package:voyager/models/airport/airport.dart';
 import 'package:voyager/services/country_service.dart';
@@ -25,7 +25,6 @@ class SearchSummaryContent extends StatelessWidget {
     }
 
     return Container(
-      color: Colors.white,
       padding: EdgeInsetsGeometry.symmetric(vertical: 16, horizontal: 16),
       child: Column(
         children: [
@@ -39,7 +38,7 @@ class SearchSummaryContent extends StatelessWidget {
             ],
           ),
           SizedBox(height: 5),
-          AirportDetailsButton(
+          NearbyAirportsButton(
             isDeparture: isDeparture,
             countryService: countryService,
           ),

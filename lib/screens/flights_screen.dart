@@ -13,7 +13,6 @@ class FlightResultsScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('FlightResultsScaffold build called');
     final searchState = context.watch<FlightSearchState>();
     final countryService = context.read<CountryService>();
     final selectedAirline = searchState.selectedAirline;
@@ -24,6 +23,7 @@ class FlightResultsScaffold extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Flights'),
+          backgroundColor: Colors.blue,
           actions: [
             TextButton(
               onPressed: () {
@@ -34,7 +34,7 @@ class FlightResultsScaffold extends StatelessWidget {
                   builder: (context) => Container(
                     height: MediaQuery.of(context).size.height * 0.9,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(16),
                         topRight: Radius.circular(16),
