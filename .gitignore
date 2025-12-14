@@ -47,6 +47,3 @@ app.*.map.json
 
 .env
 .env.*
-
-build_and_serve.sh
-.build_and_serve.sh
