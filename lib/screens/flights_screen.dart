@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:voyager/content/bottom_bar.dart';
 import 'package:voyager/content/path_results_state.dart';
 import 'package:voyager/content/search_summary.dart';
-import 'package:voyager/core/airline_select_state.dart';
+import 'package:voyager/core/airline_check_content.dart';
 import 'package:voyager/core/flight_search_state.dart';
 import 'package:voyager/filters/date_filter.dart';
 import 'package:voyager/services/country_service.dart';
@@ -16,7 +16,6 @@ class FlightResultsScaffold extends StatelessWidget {
     final searchState = context.watch<FlightSearchState>();
     final countryService = context.read<CountryService>();
     final selectedAirline = searchState.selectedAirline;
-    final enabledAirlines = searchState.enabledAirlines;
 
     return DefaultTabController(
       length: searchState.returnDate != null ? 2 : 1,
@@ -40,19 +39,7 @@ class FlightResultsScaffold extends StatelessWidget {
                         topRight: Radius.circular(16),
                       ),
                     ),
-                    child: AirlineSelectState(
-                      selectedAirline: selectedAirline,
-                      enabledAirlines: enabledAirlines,
-                      onSelected: (airline) {
-                        if (airline != selectedAirline) {
-                          if (airline == null) {
-                            searchState.clearAirline();
-                          } else {
-                            searchState.updateSearch(selectedAirline: airline);
-                          }
-                        }
-                      },
-                    ),
+                    child: AirlineCheckContent(),
                   ),
                 );
               },

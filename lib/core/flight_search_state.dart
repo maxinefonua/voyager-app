@@ -29,7 +29,8 @@ class FlightSearchState with ChangeNotifier {
   DateTime? _lastReturnDate;
   DateTime? _returnDate;
   bool _isRoundTrip = false;
-  List<Airline>? _enabledAirlines;
+  List<Airline> _includedAirlines = Airline.values;
+  List<Airline>? _singleCarrierAirlines;
   Airline? _selectedAirline;
   bool _isLoadingPathResponse = false;
   bool _isUpdating = false;
@@ -78,7 +79,8 @@ class FlightSearchState with ChangeNotifier {
   bool get isRoundTrip => _isRoundTrip;
   List<PathDetailed>? get returnPaths => _returnPaths;
   Airline? get selectedAirline => _selectedAirline;
-  List<Airline>? get enabledAirlines => _enabledAirlines;
+  List<Airline> get includedAirlines => _includedAirlines;
+  List<Airline>? get singleCarrierAirlines => _singleCarrierAirlines;
 
   bool get canSearch =>
       _departureAirport != null &&
@@ -95,6 +97,7 @@ class FlightSearchState with ChangeNotifier {
     DateTime? returnDate,
     bool? isRoundTrip,
     Airline? selectedAirline,
+    List<Airline>? includedAirlines,
     bool? clearSelectedAirline,
   }) async {
     cancelLoadMore();
@@ -109,21 +112,25 @@ class FlightSearchState with ChangeNotifier {
       _isUpdatingDeparture =
           didAirportsChange ||
           departureDate != null ||
-          selectedAirline != _selectedAirline;
+          selectedAirline != _selectedAirline ||
+          includedAirlines != _includedAirlines;
       _isUpdatingReturn =
           didAirportsChange ||
           returnDate != null ||
-          selectedAirline != _selectedAirline;
+          selectedAirline != _selectedAirline ||
+          includedAirlines != _includedAirlines;
 
       _isLoadingPathResponse =
           didAirportsChange ||
           departureDate != null ||
-          selectedAirline != _selectedAirline;
+          selectedAirline != _selectedAirline ||
+          includedAirlines != _includedAirlines;
       if (_returnDate != null) {
         _isLoadingReturnResponse =
             didAirportsChange ||
             returnDate != null ||
-            selectedAirline != _selectedAirline;
+            selectedAirline != _selectedAirline ||
+            includedAirlines != _includedAirlines;
       }
 
       _departureAirport = departureAirport ?? _departureAirport;
@@ -133,6 +140,7 @@ class FlightSearchState with ChangeNotifier {
       _isRoundTrip = isRoundTrip ?? _isRoundTrip;
       _returnDate = returnDate ?? _returnDate;
       _selectedAirline = selectedAirline ?? _selectedAirline;
+      _includedAirlines = includedAirlines ?? _includedAirlines;
 
       if (_departureAirport == null) {
         _addDepartureAirports = [];
@@ -163,26 +171,28 @@ class FlightSearchState with ChangeNotifier {
       notifyListeners();
 
       if (canSearch) {
-        _enabledAirlines = await AirlineService().fetchAirlines(
+        _singleCarrierAirlines = await AirlineService().fetchAirlines(
           [_departureAirport!.iata],
           [_destinationAirport!.iata],
         );
-        if (_enabledAirlines != null && _selectedAirline != null) {
-          if (!_enabledAirlines!.contains(_selectedAirline)) {
+        if (_singleCarrierAirlines != null && _selectedAirline != null) {
+          if (!_singleCarrierAirlines!.contains(_selectedAirline)) {
             _selectedAirline = null;
           }
         }
         notifyListeners();
 
-        _nearbyDepartureAirports = await _airportCache.fetchNearbyAirports(
-          _departureAirport!.iata,
-          _selectedAirline,
-        );
+        _nearbyDepartureAirports = await _airportCache
+            .fetchNearbyAirportsWithAirlines(
+              _departureAirport!.iata,
+              _includedAirlines,
+            );
 
-        _nearbyDestinationAirports = await _airportCache.fetchNearbyAirports(
-          _destinationAirport!.iata,
-          _selectedAirline,
-        );
+        _nearbyDestinationAirports = await _airportCache
+            .fetchNearbyAirportsWithAirlines(
+              _destinationAirport!.iata,
+              _includedAirlines,
+            );
 
         notifyListeners();
         _pathRequestDeparture = PathRequest(
@@ -195,6 +205,7 @@ class FlightSearchState with ChangeNotifier {
             ...addDestinationAirports.map((destination) => destination.iata),
           ],
           airline: _selectedAirline,
+          includedAirlines: _includedAirlines,
           timezoneId: _departureAirport!.zoneId,
           startTime: _departureDate,
         );
@@ -217,6 +228,7 @@ class FlightSearchState with ChangeNotifier {
               ...addDepartureAirports.map((depature) => depature.iata),
             ],
             airline: _selectedAirline,
+            includedAirlines: _includedAirlines,
             timezoneId: _destinationAirport!.zoneId,
             startTime: _returnDate!,
           );
@@ -245,7 +257,7 @@ class FlightSearchState with ChangeNotifier {
       } else {
         _departurePaths = [];
         _returnPaths = [];
-        _enabledAirlines = null;
+        _singleCarrierAirlines = null;
         _nearbyDepartureAirports = [];
         _nearbyDestinationAirports = [];
       }
@@ -405,6 +417,7 @@ class FlightSearchState with ChangeNotifier {
 
   void clearAirline() {
     _selectedAirline = null;
+    _includedAirlines = Airline.values;
     _isUpdating = true;
     _isUpdatingDeparture = true;
     _isUpdatingReturn = true;
@@ -431,7 +444,7 @@ class FlightSearchState with ChangeNotifier {
     _addDestinationAirports = [];
     _departureDate = DateTime.now();
     _returnDate = null;
-    _enabledAirlines = null;
+    _singleCarrierAirlines = null;
     notifyListeners();
   }
 
