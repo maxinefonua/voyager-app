@@ -21,18 +21,21 @@ class PathResultsState extends State<PathResults> {
   late final bool _isDeparture;
   bool _isNavigatingBack = false;
   final Map<String, GlobalKey> _tileKeys = {};
+  late bool _nonEmptyPathFound;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
     _isDeparture = widget.isDeparture;
+    _nonEmptyPathFound = false;
   }
 
   @override
   void didUpdateWidget(covariant PathResults oldWidget) {
     super.didUpdateWidget(oldWidget);
     _isNavigatingBack = false;
+    _nonEmptyPathFound = false;
   }
 
   @override
@@ -129,7 +132,12 @@ class PathResultsState extends State<PathResults> {
 
     final airportCache = context.read<AirportCache>();
     final timezoneService = context.read<TimezoneService>();
-    bool firstNonEmptySet = false;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_nonEmptyPathFound) {
+        _loadMore();
+      }
+    });
 
     return Expanded(
       child: LayoutBuilder(
@@ -169,9 +177,9 @@ class PathResultsState extends State<PathResults> {
                       airportMap,
                     );
                     bool initiallyExpand = false;
-                    if (localizedFlights.isNotEmpty && !firstNonEmptySet) {
+                    if (localizedFlights.isNotEmpty && !_nonEmptyPathFound) {
                       initiallyExpand = true;
-                      firstNonEmptySet = true;
+                      _nonEmptyPathFound = true;
                     }
 
                     return PathTile(

@@ -4,14 +4,14 @@ import 'package:voyager/models/airline/airline.dart';
 class PathRequest extends Equatable {
   final List<String> originList;
   final List<String> destinationList;
-  final Airline? airline;
+  final List<Airline> includedAirlines;
   final String timezoneId;
   final DateTime startTime;
 
   const PathRequest({
     required this.originList,
     required this.destinationList,
-    required this.airline,
+    required this.includedAirlines,
     required this.timezoneId,
     required this.startTime,
   });
@@ -20,7 +20,7 @@ class PathRequest extends Equatable {
   List<Object?> get props => [
     [...originList]..sort(),
     [...destinationList]..sort(),
-    airline,
+    [...includedAirlines.map((value) => value.name)]..sort(),
     timezoneId,
     startTime,
   ];

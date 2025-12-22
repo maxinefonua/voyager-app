@@ -130,10 +130,8 @@ class PathService {
     String zoneId = pathRequest.timezoneId;
     String allParams =
         'origin=$originParam&destination=$destinationParam&start=$startParam&zoneId=$zoneId';
-    if (pathRequest.airline != null) {
-      allParams =
-          '$allParams&airline=${pathRequest.airline!.name.toUpperCase()}';
-    }
+    allParams =
+        '$allParams&airline=${pathRequest.includedAirlines.map((value) => value.name.toUpperCase()).join(",")}';
     return allParams;
   }
 

@@ -22,6 +22,30 @@ class AirportCache {
     }
   }
 
+  Future<List<Airport>> fetchNearbyAirportsWithAirlines(
+    String iata,
+    List<Airline> includedAirlines,
+  ) async {
+    try {
+      String allParams = 'type=civil&limit=11&iata=$iata';
+      allParams =
+          '$allParams&airline=${includedAirlines.map((value) => value.name).join(',')}';
+      final String url = '$nearbyAirportsPath?$allParams';
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {voyagerAuthHeader: voyagerAuthToken},
+      );
+      if (response.statusCode == 200) {
+        return _airportFromJson(response.body); // Also make private
+      } else {
+        throw Exception('failed to fetch nearby airports: ${response.body}');
+      }
+    } on Exception catch (e) {
+      debugPrint('failed to fetch nearby airports: ${e.toString()}');
+      rethrow;
+    }
+  }
+
   Future<List<Airport>> fetchNearbyAirports(
     String iata,
     Airline? airline,

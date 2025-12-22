@@ -59,7 +59,7 @@ class BaseDatePickerField extends StatelessWidget {
       enabled: enabled,
       decoration: InputDecoration(
         labelText: label,
-        border: const OutlineInputBorder(),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         suffixIcon: IconButton(
           icon: Icon(Icons.date_range),
           onPressed: enabled ? onTap : null,

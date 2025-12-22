@@ -2,7 +2,7 @@ name: Build and Deploy Flutter Web to EC2
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
       run: flutter pub get
       
     - name: Build Web Release
-      run: flutter build web --release --web-renderer canvaskit
+      run: flutter build web --release
       
     - name: Setup SSH
       run: |
