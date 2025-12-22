@@ -41,6 +41,8 @@ class _AirlineCheckContentState extends State<AirlineCheckContent> {
       _singleCarrierAirlines = Set<Airline>.from(
         searchState.singleCarrierAirlines!,
       );
+    } else {
+      _singleCarrierAirlines = {};
     }
 
     // Initialize the ValueNotifiers with initial values

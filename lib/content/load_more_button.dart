@@ -9,9 +9,6 @@ class LoadMoreButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final searchState = context.watch<FlightSearchState>();
-    if (searchState.isUpdating) {
-      return _buildDisabledLoadButton();
-    }
     bool isLoading = isDeparture
         ? searchState.isLoadingPathResponse
         : searchState.isLoadingReturnResponse;
@@ -19,10 +16,6 @@ class LoadMoreButton extends StatelessWidget {
         ? searchState.hasMoreDepartures
         : searchState.hasMoreReturns;
     return _buildLoadButton(isLoading, hasMore, searchState);
-  }
-
-  Widget _buildDisabledLoadButton() {
-    return ElevatedButton(onPressed: null, child: Text('Load More'));
   }
 
   Widget _buildLoadButton(

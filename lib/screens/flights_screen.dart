@@ -6,6 +6,7 @@ import 'package:voyager/content/search_summary.dart';
 import 'package:voyager/core/airline_check_content.dart';
 import 'package:voyager/core/flight_search_state.dart';
 import 'package:voyager/filters/date_filter.dart';
+import 'package:voyager/models/airline/airline.dart';
 import 'package:voyager/services/country_service.dart';
 
 class FlightResultsScaffold extends StatelessWidget {
@@ -15,7 +16,12 @@ class FlightResultsScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final searchState = context.watch<FlightSearchState>();
     final countryService = context.read<CountryService>();
-    final selectedAirline = searchState.selectedAirline;
+    final allSelected =
+        searchState.includedAirlines.length == Airline.values.length;
+    final airlineText = allSelected
+        ? 'Multi-Airlines'
+        : searchState.includedAirlines.first.displayText;
+    final plusAirlineCount = searchState.includedAirlines.length - 1;
 
     return DefaultTabController(
       length: searchState.returnDate != null ? 2 : 1,
@@ -47,7 +53,12 @@ class FlightResultsScaffold extends StatelessWidget {
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.transparent,
               ),
-              child: Text(selectedAirline?.displayText ?? 'Multi-Airline'),
+              child: Badge(
+                label: Text('+$plusAirlineCount'),
+                offset: Offset(16, -8),
+                isLabelVisible: plusAirlineCount > 0,
+                child: Text(airlineText),
+              ),
             ),
             SizedBox(width: 30),
           ],

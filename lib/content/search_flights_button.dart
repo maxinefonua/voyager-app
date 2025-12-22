@@ -33,10 +33,7 @@ class SearchFlightsButton extends StatelessWidget {
 
     return () async {
       try {
-        // Perform the search WITHOUT awaiting it
-        searchState.updateSearch(); // This returns a Future but we don't await
-
-        // Navigate immediately to results screen
+        searchState.updateSearch();
         if (context.mounted) {
           Navigator.push(
             context,

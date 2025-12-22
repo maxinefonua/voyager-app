@@ -31,7 +31,6 @@ class FlightSearchState with ChangeNotifier {
   bool _isRoundTrip = false;
   List<Airline> _includedAirlines = Airline.values;
   List<Airline>? _singleCarrierAirlines;
-  Airline? _selectedAirline;
   bool _isLoadingPathResponse = false;
   bool _isUpdating = false;
   bool _isUpdatingDeparture = false;
@@ -78,7 +77,6 @@ class FlightSearchState with ChangeNotifier {
   DateTime? get returnDate => _returnDate;
   bool get isRoundTrip => _isRoundTrip;
   List<PathDetailed>? get returnPaths => _returnPaths;
-  Airline? get selectedAirline => _selectedAirline;
   List<Airline> get includedAirlines => _includedAirlines;
   List<Airline>? get singleCarrierAirlines => _singleCarrierAirlines;
 
@@ -96,9 +94,7 @@ class FlightSearchState with ChangeNotifier {
     DateTime? departureDate,
     DateTime? returnDate,
     bool? isRoundTrip,
-    Airline? selectedAirline,
     List<Airline>? includedAirlines,
-    bool? clearSelectedAirline,
   }) async {
     cancelLoadMore();
     try {
@@ -112,24 +108,20 @@ class FlightSearchState with ChangeNotifier {
       _isUpdatingDeparture =
           didAirportsChange ||
           departureDate != null ||
-          selectedAirline != _selectedAirline ||
           includedAirlines != _includedAirlines;
       _isUpdatingReturn =
           didAirportsChange ||
           returnDate != null ||
-          selectedAirline != _selectedAirline ||
           includedAirlines != _includedAirlines;
 
       _isLoadingPathResponse =
           didAirportsChange ||
           departureDate != null ||
-          selectedAirline != _selectedAirline ||
           includedAirlines != _includedAirlines;
       if (_returnDate != null) {
         _isLoadingReturnResponse =
             didAirportsChange ||
             returnDate != null ||
-            selectedAirline != _selectedAirline ||
             includedAirlines != _includedAirlines;
       }
 
@@ -139,7 +131,6 @@ class FlightSearchState with ChangeNotifier {
       _departureDate = departureDate ?? _departureDate;
       _isRoundTrip = isRoundTrip ?? _isRoundTrip;
       _returnDate = returnDate ?? _returnDate;
-      _selectedAirline = selectedAirline ?? _selectedAirline;
       _includedAirlines = includedAirlines ?? _includedAirlines;
 
       if (_departureAirport == null) {
@@ -175,11 +166,6 @@ class FlightSearchState with ChangeNotifier {
           [_departureAirport!.iata],
           [_destinationAirport!.iata],
         );
-        if (_singleCarrierAirlines != null && _selectedAirline != null) {
-          if (!_singleCarrierAirlines!.contains(_selectedAirline)) {
-            _selectedAirline = null;
-          }
-        }
         notifyListeners();
 
         _nearbyDepartureAirports = await _airportCache
@@ -204,7 +190,6 @@ class FlightSearchState with ChangeNotifier {
             _destinationAirport!.iata,
             ...addDestinationAirports.map((destination) => destination.iata),
           ],
-          airline: _selectedAirline,
           includedAirlines: _includedAirlines,
           timezoneId: _departureAirport!.zoneId,
           startTime: _departureDate,
@@ -227,7 +212,6 @@ class FlightSearchState with ChangeNotifier {
               _departureAirport!.iata,
               ...addDepartureAirports.map((depature) => depature.iata),
             ],
-            airline: _selectedAirline,
             includedAirlines: _includedAirlines,
             timezoneId: _destinationAirport!.zoneId,
             startTime: _returnDate!,
@@ -374,6 +358,15 @@ class FlightSearchState with ChangeNotifier {
     notifyListeners();
   }
 
+  void setInitialAirline(Airline airline) {
+    _includedAirlines = [];
+    _includedAirlines.add(airline);
+  }
+
+  void clearInitialAilrine() {
+    _includedAirlines = Airline.values;
+  }
+
   void setDestinationAirport(Airport airport) {
     if (_destinationAirport?.iata == airport.iata) return;
     _destinationAirport = airport;
@@ -413,16 +406,6 @@ class FlightSearchState with ChangeNotifier {
     }
     _isRoundTrip = roundTrip;
     notifyListeners();
-  }
-
-  void clearAirline() {
-    _selectedAirline = null;
-    _includedAirlines = Airline.values;
-    _isUpdating = true;
-    _isUpdatingDeparture = true;
-    _isUpdatingReturn = true;
-    notifyListeners();
-    updateSearch();
   }
 
   void reverseAirports() {
