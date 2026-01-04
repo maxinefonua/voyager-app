@@ -29,11 +29,10 @@ class SearchSummaryContent extends StatelessWidget {
       child: Column(
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildAirportBadge(isDeparture, origin),
-              SizedBox(width: 12),
-              Expanded(child: _buildAirportNameSection(origin, destination)),
-              SizedBox(width: 12),
+              _buildAirportNameSection(origin, destination),
               _buildAirportBadge(!isDeparture, destination),
             ],
           ),

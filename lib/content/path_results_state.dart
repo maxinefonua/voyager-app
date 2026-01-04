@@ -26,7 +26,6 @@ class PathResultsState extends State<PathResults> {
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onScroll);
     _isDeparture = widget.isDeparture;
     _nonEmptyPathFound = false;
   }
@@ -42,14 +41,6 @@ class PathResultsState extends State<PathResults> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _onScroll() {
-    if (_isNavigatingBack) return;
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
-      _loadMore();
-    }
   }
 
   void _scrollToExpandedTile(String pathKey) {

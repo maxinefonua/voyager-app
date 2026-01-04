@@ -61,22 +61,33 @@ class SplashScreenState extends State<SplashScreen>
           color: Colors.white,
         );
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor, // Or your brand color
-      body: Center(
-        child: FadeTransition(
-          opacity: _animation,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Your logo/icon
-              LogoSvg(size: 100, color: Colors.white),
-              const SizedBox(height: 20),
-              // App name with animation
-              ScaleTransition(
-                scale: _animation,
-                child: Text('Voyager', style: titleStyle),
-              ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Theme.of(context).primaryColor,
+              Theme.of(context).primaryColorDark,
             ],
+          ),
+        ),
+        child: Center(
+          child: FadeTransition(
+            opacity: _animation,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Your logo/icon
+                LogoSvg(size: 100, color: Colors.white),
+                const SizedBox(height: 20),
+                // App name with animation
+                ScaleTransition(
+                  scale: _animation,
+                  child: Text('Voyager', style: titleStyle),
+                ),
+              ],
+            ),
           ),
         ),
       ),
