@@ -108,7 +108,7 @@ class DateRangePickerField extends StatelessWidget {
     if (initialRange == null && departureDate != null) {
       initialRange = DateTimeRange(
         start: departureDate!,
-        end: departureDate!, // Same as start
+        end: departureDate!.add(Duration(days: 5)),
       );
     }
 
@@ -116,8 +116,7 @@ class DateRangePickerField extends StatelessWidget {
       context: context,
       firstDate: firstDate,
       lastDate: effectiveLastDate,
-      initialDateRange:
-          initialRange, // Use initialRange here, not selectedDateRange
+      initialDateRange: initialRange,
     );
 
     if (picked != null) {

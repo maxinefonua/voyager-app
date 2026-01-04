@@ -53,13 +53,16 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
     Airport destination;
     List<Airport> nearbyOrigins;
     List<Airport> nearbyDestinations;
+    bool firstTabDeparture;
 
     if (widget.isDeparture) {
+      firstTabDeparture = true;
       origin = searchState.departureAirport!;
       destination = searchState.destinationAirport!;
       nearbyOrigins = searchState.nearbyDepartureAirports;
       nearbyDestinations = searchState.nearbyDestinationAirports;
     } else {
+      firstTabDeparture = false;
       origin = searchState.destinationAirport!;
       destination = searchState.departureAirport!;
       nearbyOrigins = searchState.nearbyDestinationAirports;
@@ -80,13 +83,14 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
                 Column(
                   children: [
                     Divider(height: 0),
-                    _buildAirportHeader(origin),
+                    _buildAirportHeader(origin, firstTabDeparture),
                     Divider(height: 0),
                     Expanded(
                       child: _buildAirportsList(
                         widget.isDeparture,
                         nearbyOrigins.skip(1).toList(),
                         origin,
+                        firstTabDeparture,
                       ),
                     ),
                   ],
@@ -96,13 +100,14 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
                 Column(
                   children: [
                     Divider(height: 0),
-                    _buildAirportHeader(destination),
+                    _buildAirportHeader(destination, !firstTabDeparture),
                     Divider(height: 0),
                     Expanded(
                       child: _buildAirportsList(
                         !widget.isDeparture,
                         nearbyDestinations.skip(1).toList(),
                         destination,
+                        !firstTabDeparture,
                       ),
                     ),
                   ],
@@ -119,6 +124,7 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
     bool isOrigin,
     List<Airport> airports,
     Airport selectedAirport,
+    bool firstTab,
   ) {
     return ValueListenableBuilder<Set<String>>(
       valueListenable: isOrigin ? selectedOrigins : selectedDestinations,
@@ -169,14 +175,14 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
               leading: Container(
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.blue[50],
+                  color: !firstTab ? Colors.green[50] : Colors.blue[50],
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   airport.iata,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue[700],
+                    color: !firstTab ? Colors.green[700] : Colors.blue[700],
                   ),
                 ),
               ),
@@ -287,12 +293,15 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
     );
   }
 
-  Widget _buildAirportHeader(Airport airport) {
+  Widget _buildAirportHeader(Airport airport, bool firstTab) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.blue, width: 2),
+        border: Border.all(
+          color: !firstTab ? Colors.green : Colors.blue,
+          width: 2,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.blue.withAlpha(5),
@@ -309,7 +318,7 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
               width: 4,
               height: 60,
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: !firstTab ? Colors.green : Colors.blue,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -338,13 +347,13 @@ class _NearbyIncludeStateState extends State<NearbyIncludeState> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.blue[50],
+                color: !firstTab ? Colors.green[50] : Colors.blue[50],
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 airport.iata,
                 style: TextStyle(
-                  color: Colors.blue[700],
+                  color: !firstTab ? Colors.green[700] : Colors.blue[700],
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),

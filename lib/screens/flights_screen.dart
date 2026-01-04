@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:voyager/content/bottom_bar.dart';
@@ -54,7 +56,10 @@ class FlightResultsScaffold extends StatelessWidget {
                 backgroundColor: Colors.transparent,
               ),
               child: Badge(
-                label: Text('+$plusAirlineCount'),
+                label: Text(
+                  '+$plusAirlineCount',
+                  style: TextStyle(color: Colors.white),
+                ),
                 offset: Offset(16, -8),
                 isLabelVisible: plusAirlineCount > 0,
                 child: Text(airlineText),
@@ -63,31 +68,43 @@ class FlightResultsScaffold extends StatelessWidget {
             SizedBox(width: 30),
           ],
         ),
-        body: Column(
-          children: [
-            if (searchState.returnDate != null)
-              TabBar(
-                tabs: [
-                  Tab(text: 'Departure'),
-                  Tab(text: 'Return'),
-                ],
-                labelColor: Colors.blue,
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: Colors.blue,
-              ),
-            Expanded(
-              child: TabBarView(
+        body: Center(
+          child: Container(
+            constraints: BoxConstraints(maxWidth: 800, minWidth: 345),
+            child: PhysicalModel(
+              elevation: 8,
+              color: Theme.of(context).scaffoldBackgroundColor,
+              shadowColor: Colors.black,
+              child: Column(
                 children: [
-                  _buildFlightResults(searchState, countryService, true),
                   if (searchState.returnDate != null)
-                    _buildFlightResults(searchState, countryService, false),
+                    TabBar(
+                      tabs: [
+                        Tab(text: 'Departure'),
+                        Tab(text: 'Return'),
+                      ],
+                      labelColor: Colors.blue,
+                      unselectedLabelColor: Colors.grey,
+                      indicatorColor: Colors.blue,
+                    ),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        _buildFlightResults(searchState, countryService, true),
+                        if (searchState.returnDate != null)
+                          _buildFlightResults(
+                            searchState,
+                            countryService,
+                            false,
+                          ),
+                      ],
+                    ),
+                  ),
+                  TabAwareBottomBar(isUpdating: searchState.isUpdating),
                 ],
               ),
             ),
-          ],
-        ),
-        bottomNavigationBar: TabAwareBottomBar(
-          isUpdating: searchState.isUpdating,
+          ),
         ),
       ),
     );

@@ -10,8 +10,9 @@ class HomeAppBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final searchState = context.watch<FlightSearchState>();
-    return Scaffold(
-      body: Padding(
+    return Center(
+      child: Container(
+        constraints: BoxConstraints(maxWidth: 800, minWidth: 345),
         padding: const EdgeInsets.all(16.0),
         child: _buildSearchContent(context, searchState),
       ),

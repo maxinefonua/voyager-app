@@ -137,7 +137,7 @@ class _AirlineCheckContentState extends State<AirlineCheckContent> {
         ),
         SizedBox(height: 8),
         Text(
-          'Fight paths are by multi-airline connections',
+          'Fight paths are by multi-airline connections only',
           style: TextStyle(color: Colors.grey[400], fontSize: 14),
         ),
       ],
@@ -206,30 +206,31 @@ class _AirlineCheckContentState extends State<AirlineCheckContent> {
           label: Text(selectedCount.toString()),
           smallSize: 20,
           backgroundColor: disabled
-              ? Colors.grey[400]
-              : selectedCount > 0
-              ? Colors.blue
-              : Colors.grey[700],
+              ? Colors.grey[500]
+              : hasSelection
+              ? Colors.blue[400]
+              : Colors.grey[300],
           child: Icon(
             Icons.airlines,
             color: disabled
                 ? Colors.grey[600]
                 : hasSelection
                 ? Colors.blue[800]
-                : Colors.grey[400],
+                : Colors.grey[500],
           ),
         ),
         title: Text(
           text,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: disabled
-                ? Colors.grey[400]
+                ? Colors.grey[600]
                 : hasSelection
                 ? Colors.blue
-                : Colors.grey[600],
+                : Colors.grey[400],
           ),
         ),
         trailing: Checkbox(
+          activeColor: Colors.blue,
           value: hasSelection,
           visualDensity: VisualDensity.compact,
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -313,7 +314,9 @@ class _AirlineCheckContentState extends State<AirlineCheckContent> {
       },
       icon: Badge(
         label: _filterSingleCarriers ? Text(airlineCount.toString()) : null,
-        backgroundColor: Colors.blue,
+        backgroundColor: _singleCarrierAirlines.isEmpty
+            ? Colors.grey[400]
+            : Colors.blue,
         offset: Offset(8, -8),
         child: Icon(
           _filterSingleCarriers
