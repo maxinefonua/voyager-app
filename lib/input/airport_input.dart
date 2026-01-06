@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:voyager/core/airport_search_state.dart';
 import 'package:voyager/core/flight_search_state.dart';
 import 'package:voyager/models/airport/airport.dart';
-import 'package:voyager/utils/search.dart';
 
 class AirportInput extends StatelessWidget {
   final InputDecoration inputDecoration;
