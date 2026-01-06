@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:voyager/content/bottom_bar.dart';
@@ -38,8 +36,11 @@ class FlightResultsScaffold extends StatelessWidget {
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
+                  constraints: BoxConstraints(
+                    maxWidth: 800,
+                    maxHeight: MediaQuery.of(context).size.height * 0.9,
+                  ),
                   builder: (context) => Container(
-                    height: MediaQuery.of(context).size.height * 0.9,
                     decoration: BoxDecoration(
                       color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.only(

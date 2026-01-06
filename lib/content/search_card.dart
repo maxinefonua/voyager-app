@@ -85,6 +85,9 @@ class SearchCard extends StatelessWidget {
             onSelected: searchState.setDepartureAirport,
             selectedAirport: searchState.departureAirport,
             otherAirport: searchState.destinationAirport,
+            otherAirportCodes: Set.from(
+              searchState.addDestinationAirports.map((airport) => airport.iata),
+            ),
             isOrigin: true,
             searchState: searchState,
           ),
@@ -122,6 +125,9 @@ class SearchCard extends StatelessWidget {
             onSelected: searchState.setDestinationAirport,
             selectedAirport: searchState.destinationAirport,
             otherAirport: searchState.departureAirport,
+            otherAirportCodes: Set.from(
+              searchState.addDepartureAirports.map((airport) => airport.iata),
+            ),
             isOrigin: false,
             searchState: searchState,
           ),

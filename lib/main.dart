@@ -39,9 +39,8 @@ void main() async {
                 timezoneService: snapshot.data!['timezoneService'],
               );
             }
-            // You can show a different loading screen here if needed
             return const Center(
-              child: CircularProgressIndicator(color: Colors.white),
+              child: CircularProgressIndicator(color: Colors.blue),
             );
           },
         ),

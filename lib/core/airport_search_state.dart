@@ -6,13 +6,17 @@ import 'package:voyager/services/airport_cache.dart';
 class AirportSearchContent extends StatefulWidget {
   final String title;
   final ValueChanged<Airport> onSelected;
+  final Airport? selectedAirport;
   final Airport? otherAirport;
+  final Set<String> otherAirportCodes;
 
   const AirportSearchContent({
     super.key,
     required this.title,
     required this.onSelected,
+    this.selectedAirport,
     this.otherAirport,
+    required this.otherAirportCodes,
   });
 
   @override
@@ -20,14 +24,24 @@ class AirportSearchContent extends StatefulWidget {
 }
 
 class _AirportSearchContentState extends State<AirportSearchContent> {
-  final TextEditingController _searchController = TextEditingController();
+  late TextEditingController _searchController;
   final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
+
+    _searchController = TextEditingController(
+      text: widget.selectedAirport != null ? widget.selectedAirport!.iata : '',
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _searchFocusNode.requestFocus();
+      // Move cursor to end if there's text
+      if (_searchController.text.isNotEmpty) {
+        _searchController.selection = TextSelection.fromPosition(
+          TextPosition(offset: _searchController.text.length),
+        );
+      }
     });
   }
 
@@ -42,15 +56,11 @@ class _AirportSearchContentState extends State<AirportSearchContent> {
   Widget build(BuildContext context) {
     final airportCache = context.read<AirportCache>();
     final airports = airportCache.getAllAirports();
-
     return Column(
       children: [
         // Header
         Container(
-          padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: Colors.grey[300]!)),
-          ),
+          padding: EdgeInsets.only(top: 16, left: 16, right: 16),
           child: Row(
             children: [
               IconButton(
@@ -90,12 +100,20 @@ class _AirportSearchContentState extends State<AirportSearchContent> {
 
   Widget _buildAirportsList(List<Airport> airports) {
     final searchText = _searchController.text.toLowerCase();
-    final filteredAirports = airports.where((airport) {
+    List<Airport> filteredAirports = airports.where((airport) {
       if (searchText.isEmpty) return false;
-      return airport.name.toLowerCase().contains(searchText) ||
-          airport.iata.toLowerCase().contains(searchText) ||
-          airport.city.toLowerCase().contains(searchText);
+      return airport.name.toLowerCase().startsWith(searchText) ||
+          airport.iata.toLowerCase().startsWith(searchText) ||
+          airport.city.toLowerCase().startsWith(searchText);
     }).toList();
+    if (filteredAirports.isEmpty) {
+      filteredAirports = airports.where((airport) {
+        if (searchText.isEmpty) return false;
+        return airport.name.toLowerCase().contains(searchText) ||
+            airport.iata.toLowerCase().contains(searchText) ||
+            airport.city.toLowerCase().contains(searchText);
+      }).toList();
+    }
 
     if (filteredAirports.isEmpty) {
       return Center(
@@ -111,12 +129,13 @@ class _AirportSearchContentState extends State<AirportSearchContent> {
     return ListView.separated(
       padding: EdgeInsets.symmetric(horizontal: 16),
       itemCount: filteredAirports.length,
-      separatorBuilder: (context, index) => Divider(),
+      separatorBuilder: (context, index) => Divider(height: 0),
       itemBuilder: (context, index) {
         final airport = filteredAirports[index];
         final isDisabled =
             widget.otherAirport != null &&
-            widget.otherAirport!.iata == airport.iata;
+            (widget.otherAirport!.iata == airport.iata ||
+                widget.otherAirportCodes.contains(airport.iata));
         return ListTile(
           title: Text(
             airport.name,
