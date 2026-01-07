@@ -22,7 +22,7 @@ class AirlineAutocomplete extends StatelessWidget {
           return const Iterable<String>.empty();
         }
         return _airlines.where((String option) {
-          return option.toLowerCase().contains(
+          return option.toLowerCase().startsWith(
             textEditingValue.text.toLowerCase(),
           );
         });

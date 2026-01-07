@@ -205,28 +205,22 @@ class _AirlineCheckContentState extends State<AirlineCheckContent> {
         leading: Badge(
           label: Text(selectedCount.toString()),
           smallSize: 20,
-          backgroundColor: disabled
-              ? Colors.grey[500]
-              : hasSelection
-              ? Colors.blue[400]
-              : Colors.grey[300],
+          backgroundColor: hasSelection ? Colors.blue[400] : Colors.grey[300],
           child: Icon(
             Icons.airlines,
-            color: disabled
-                ? Colors.grey[600]
-                : hasSelection
-                ? Colors.blue[800]
-                : Colors.grey[500],
+            color: hasSelection
+                ? Colors.blue
+                : Theme.of(context).hintColor.withAlpha(90),
           ),
         ),
         title: Text(
           text,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: disabled
-                ? Colors.grey[600]
+                ? Theme.of(context).hintColor.withAlpha(90)
                 : hasSelection
                 ? Colors.blue
-                : Colors.grey[400],
+                : Theme.of(context).hintColor,
           ),
         ),
         trailing: Checkbox(
@@ -315,7 +309,7 @@ class _AirlineCheckContentState extends State<AirlineCheckContent> {
       icon: Badge(
         label: _filterSingleCarriers ? Text(airlineCount.toString()) : null,
         backgroundColor: _singleCarrierAirlines.isEmpty
-            ? Colors.grey[400]
+            ? Theme.of(context).hintColor.withAlpha(50)
             : Colors.blue,
         offset: Offset(8, -8),
         child: Icon(
@@ -330,7 +324,9 @@ class _AirlineCheckContentState extends State<AirlineCheckContent> {
           title: Text(
             'Single Carriers',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: _filterSingleCarriers ? Colors.blue : Colors.grey[600],
+              color: _filterSingleCarriers
+                  ? Colors.blue
+                  : Theme.of(context).hintColor,
             ),
           ),
         ),

@@ -37,7 +37,9 @@ class AirlineCheckListItem extends StatelessWidget {
         style: TextStyle(
           fontSize: 16,
           fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-          color: isSelected ? Colors.grey[300] : Colors.grey[500],
+          color: isSelected
+              ? Theme.of(context).hintColor.withAlpha(200)
+              : Theme.of(context).hintColor.withAlpha(80),
         ),
       ),
       trailing: Checkbox(

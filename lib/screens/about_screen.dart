@@ -1,38 +1,81 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:voyager/static/logo_svg.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
-class AboutScaffold extends StatelessWidget {
+class AboutScaffold extends StatefulWidget {
   const AboutScaffold({super.key});
+
+  @override
+  State<AboutScaffold> createState() => _AboutScreenState();
+}
+
+class _AboutScreenState extends State<AboutScaffold> {
+  String appVersion = 'Loading...';
+  String appName = 'Loading...';
+
+  @override
+  void initState() {
+    super.initState();
+    _initPackageInfo();
+  }
+
+  Future<void> _initPackageInfo() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+
+    setState(() {
+      appVersion = packageInfo.version;
+      appName = packageInfo.appName;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('About'), backgroundColor: Colors.blue),
-      body: Stack(
-        children: [
-          _buildBackgroundFill(context),
-          ListView(
-            padding: EdgeInsets.all(16),
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          constraints: BoxConstraints(maxWidth: 650, minWidth: 345),
+          child: Column(
             children: [
-              _buildCard(
-                context,
-                _buildVoyagerLabel(context),
-                _buildVoyagerContent(context),
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: 16.0,
+                  left: 16.0,
+                  right: 16.0,
+                ),
+                child: _buildCard(
+                  context,
+                  _buildVoyagerLabel(context),
+                  _buildVoyagerContent(context),
+                ),
               ),
-              _buildCard(
-                context,
-                _buildTitleLabel(context, 'Development'),
-                _buildDevelopmentContent(context),
-              ),
-              _buildCard(
-                context,
-                _buildTitleLabel(context, 'Built With'),
-                _buildTechContent(context),
+              Expanded(
+                child: Stack(
+                  children: [
+                    _buildBackgroundFill(context),
+                    ListView(
+                      padding: EdgeInsets.all(16),
+                      children: [
+                        _buildCard(
+                          context,
+                          _buildTitleLabel(context, 'Development'),
+                          _buildDevelopmentContent(context),
+                        ),
+                        _buildCard(
+                          context,
+                          _buildTitleLabel(context, 'Built With'),
+                          _buildTechContent(context),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -46,14 +89,18 @@ class AboutScaffold extends StatelessWidget {
   }
 
   Widget _buildBackgroundFill(BuildContext context) {
-    return Positioned.fill(
+    return Align(
+      alignment: Alignment.topCenter,
       child: Padding(
-        padding: EdgeInsetsGeometry.symmetric(horizontal: 8),
-        child: LogoSvg(
-          size: 240,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Theme.of(context).primaryColor
-              : Colors.blue.withAlpha(10),
+        padding: const EdgeInsets.only(left: 16, right: 10, top: 38),
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: LogoSvg(
+            size: 420,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Theme.of(context).primaryColor
+                : Colors.blue.withAlpha(10),
+          ),
         ),
       ),
     );
@@ -88,7 +135,10 @@ class AboutScaffold extends StatelessWidget {
           ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         SizedBox(width: 8),
-        Text('v0.0.1', style: TextStyle(fontSize: 12, color: Colors.grey)),
+        Text(
+          'v $appVersion',
+          style: TextStyle(fontSize: 12, color: Colors.grey),
+        ),
         Spacer(),
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
