@@ -24,6 +24,9 @@ jobs:
     - name: Get Dependencies
       run: flutter pub get
       
+    - name: Generate app icons
+      run: flutter pub run flutter_launcher_icons
+      
     - name: Build Web Release
       run: flutter build web --release
       
