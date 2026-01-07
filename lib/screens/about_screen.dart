@@ -26,9 +26,6 @@ class _AboutScreenState extends State<AboutScaffold> {
     setState(() {
       appVersion = packageInfo.version;
       appName = packageInfo.appName;
-      // You can also get:
-      // packageInfo.buildNumber - for build number after the '+'
-      // packageInfo.packageName - bundle identifier/package name
     });
   }
 

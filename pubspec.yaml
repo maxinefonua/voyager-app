@@ -54,6 +54,7 @@ dependencies:
   package_info_plus: ^8.1.0
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   flutter_test:
     sdk: flutter
 
