@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:voyager/static/logo_svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -184,7 +185,7 @@ class _AboutScreenState extends State<AboutScaffold> {
         _buildTechChip('Dart', context),
         _buildTechChip('Material Design', context),
         _buildTechChip('Visual Studio', context),
-        _buildTechChip('Voyager API', context),
+        _buildTechChip('AWS EC2', context),
         _buildTechChip('GeoNames', context),
         _buildTechChip('FlightRadar', context),
       ],
@@ -199,20 +200,20 @@ class _AboutScreenState extends State<AboutScaffold> {
           'Maxine Fonua',
           'Developer',
           Icons.person,
-          'https://www.linkedin.com/in/maxfonua',
-        ),
-        _buildTileItem(
-          context,
-          'Contact',
-          'maxinefonua@gmail.com',
-          Icons.mail,
           'https://maxinefonua.com/',
         ),
         _buildTileItem(
           context,
-          'Source Code',
+          'Voyager API',
+          'Backend Services',
+          Icons.api_rounded,
+          'https://api.voyagerapp.org/',
+        ),
+        _buildTileItem(
+          context,
           'GitHub Repository',
-          Icons.code,
+          'Flutter Source Code',
+          FontAwesomeIcons.github,
           'https://github.com/maxinefonua/voyager-app',
         ),
       ],
