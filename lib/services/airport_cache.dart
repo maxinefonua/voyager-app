@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:voyager/config/voyager_api.dart';
 import 'package:voyager/models/airline/airline.dart';
 import 'package:voyager/models/airport/airport.dart';
+import 'package:voyager/models/voyager/paged_response.dart';
 
 class AirportCache {
   final Map<String, Airport> _airportsCache = {};
@@ -76,17 +77,32 @@ class AirportCache {
 
   // Make this private since it's only used internally
   Future<List<Airport>> _fetchAirports() async {
+    List<Airport> airportList = [];
     try {
       final String url = airportsPathWithParams;
-      final response = await http.get(
-        Uri.parse(url),
+      int page = 0;
+      String withPageParams = _getPageParams(url, page);
+      http.Response response = await http.get(
+        Uri.parse(withPageParams),
         headers: {voyagerAuthHeader: voyagerAuthToken},
       );
-      if (response.statusCode == 200) {
-        return _airportFromJson(response.body); // Also make private
-      } else {
-        throw Exception('Failed to fetch airports: ${response.body}');
+      while (response.statusCode == 200) {
+        PagedResponse<Airport> pagedResponse = PagedResponse.fromJson(
+          json.decode(response.body),
+          Airport.fromJson,
+        );
+        airportList.addAll(pagedResponse.content);
+        if (pagedResponse.last) {
+          return airportList;
+        }
+        page++;
+        withPageParams = _getPageParams(url, page);
+        response = await http.get(
+          Uri.parse(withPageParams),
+          headers: {voyagerAuthHeader: voyagerAuthToken},
+        );
       }
+      throw Exception('Failed to fetch airports: ${response.body}');
     } on http.ClientException catch (e) {
       throw Exception('Failed to load airports: $e');
     }
@@ -118,5 +134,10 @@ class AirportCache {
     for (final airport in airports) {
       _airportsCache[airport.iata.toUpperCase()] = airport;
     }
+  }
+
+  String _getPageParams(String url, int page) {
+    int size = 1000;
+    return '$url&page=$page&size=$size';
   }
 }

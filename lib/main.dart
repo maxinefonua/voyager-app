@@ -60,7 +60,6 @@ class _InitializationScreenState extends State<InitializationScreen>
     _controller.forward();
 
     _initPackageInfo();
-    // Initialize services
     _initializeServices();
   }
 
