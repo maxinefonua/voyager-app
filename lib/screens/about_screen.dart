@@ -213,7 +213,7 @@ class _AboutScreenState extends State<AboutScaffold> {
           context,
           'GitHub Repository',
           'Flutter Source Code',
-          FontAwesomeIcons.github,
+          FontAwesomeIcons.github.data,
           'https://github.com/maxinefonua/voyager-app',
         ),
       ],
