@@ -17,8 +17,9 @@ class CountryService {
       final countries = await _fetchCountries(); // Now private
       _populateCache(countries);
       _isInitialized = true;
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('Failed to initialize CountryService: $e');
+      debugPrint('Stacktrace: $stackTrace');
       rethrow;
     }
   }
