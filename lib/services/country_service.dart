@@ -37,6 +37,7 @@ class CountryService {
         headers: {voyagerAuthHeader: voyagerAuthToken},
       );
       while (response.statusCode == 200) {
+        debugPrint(response.body);
         PagedResponse<Country> pagedResponse = PagedResponse.fromJson(
           json.decode(response.body),
           Country.fromJson,
@@ -53,9 +54,9 @@ class CountryService {
           headers: {voyagerAuthHeader: voyagerAuthToken},
         );
       }
-      throw Exception('Failed to fetch airports: ${response.body}');
+      throw Exception('Failed to fetch countries: ${response.body}');
     } on http.ClientException catch (e) {
-      throw Exception('Failed to load airports: $e');
+      throw Exception('Failed to load countries: $e');
     }
   }
 
