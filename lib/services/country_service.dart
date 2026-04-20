@@ -54,8 +54,10 @@ class CountryService {
           headers: {voyagerAuthHeader: voyagerAuthToken},
         );
       }
+      debugPrint("failed to fetch all countries");
       throw Exception('Failed to fetch countries: ${response.body}');
     } on http.ClientException catch (e) {
+      debugPrint("failed to all all countries");
       throw Exception('Failed to load countries: $e');
     }
   }
