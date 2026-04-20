@@ -1,7 +1,7 @@
 import 'package:voyager/models/airline/airline.dart';
 
-String get baseUrl => "/api";
-// String get baseUrl => "http://localhost:8080";
+// String get baseUrl => "/api";
+String get baseUrl => "http://localhost:8080";
 // String get baseUrl => "https://api.voyagerapp.org";
 String get voyagerAuthToken => "dev_api_key";
 
@@ -16,3 +16,7 @@ String get pathPath => '$baseUrl/path';
 String get airlinePath => '$baseUrl/airlines';
 
 const String voyagerAuthHeader = 'X-Api-Key';
+
+String getPageParams(int page, int size) {
+  return 'page=$page&size=$size';
+}
