@@ -76,12 +76,6 @@ class CountryService {
 
   bool get isInitialized => _isInitialized;
 
-  // Make JSON parsing private too
-  Future<List<Country>> _countryFromJson(String body) async {
-    final List<dynamic> jsonList = json.decode(body);
-    return jsonList.map((jsonItem) => Country.fromJson(jsonItem)).toList();
-  }
-
   void _populateCache(List<Country> countries) {
     _countriesCache.clear();
     for (final country in countries) {

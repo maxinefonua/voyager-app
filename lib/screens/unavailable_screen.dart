@@ -60,15 +60,15 @@ class _AnimatedUnavailableScreenState extends State<UnavailableScreen>
               ScaleTransition(
                 scale: _pulseAnimation,
                 child: Container(
-                  width: 120,
-                  height: 120,
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
                     color: Theme.of(context).dividerColor.withAlpha(10),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    Icons.wifi_off,
-                    size: 64,
+                    Icons.cloud_off_rounded,
+                    size: 50,
                     color: Theme.of(context).dividerColor,
                   ),
                 ),
@@ -77,9 +77,9 @@ class _AnimatedUnavailableScreenState extends State<UnavailableScreen>
               Text(
                 'Oops! Service Unavailable',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).hintColor,
-                ),
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).hintColor,
+                    ),
               ),
               const SizedBox(height: 16),
               Padding(
