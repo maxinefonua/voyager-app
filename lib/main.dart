@@ -129,8 +129,6 @@ class _InitializationScreenState extends State<InitializationScreen>
   }
 
   Future<void> _initializeServices() async {
-    final startTime = DateTime.now();
-
     try {
       // Initialize each service with individual error handling
 
@@ -139,10 +137,10 @@ class _InitializationScreenState extends State<InitializationScreen>
       try {
         countryService = CountryService();
         await countryService.initialize().timeout(
-          const Duration(seconds: 10),
-          onTimeout: () =>
-              throw Exception('Country service initialization timed out'),
-        );
+              const Duration(seconds: 10),
+              onTimeout: () =>
+                  throw Exception('Country service initialization timed out'),
+            );
         debugPrint('✓ CountryService initialized');
       } catch (e) {
         _handleInitializationError('Country Service', e.toString());
@@ -154,10 +152,10 @@ class _InitializationScreenState extends State<InitializationScreen>
       try {
         airportCache = AirportCache();
         await airportCache.initialize().timeout(
-          const Duration(seconds: 15),
-          onTimeout: () =>
-              throw Exception('Airport cache initialization timed out'),
-        );
+              const Duration(seconds: 15),
+              onTimeout: () =>
+                  throw Exception('Airport cache initialization timed out'),
+            );
         debugPrint('✓ AirportCache initialized');
       } catch (e) {
         _handleInitializationError('Airport Cache', e.toString());
@@ -169,10 +167,10 @@ class _InitializationScreenState extends State<InitializationScreen>
       try {
         timezoneService = createTimezoneService();
         await timezoneService.initialize().timeout(
-          const Duration(seconds: 10),
-          onTimeout: () =>
-              throw Exception('Timezone service initialization timed out'),
-        );
+              const Duration(seconds: 10),
+              onTimeout: () =>
+                  throw Exception('Timezone service initialization timed out'),
+            );
         debugPrint('✓ TimezoneService initialized');
       } catch (e) {
         _handleInitializationError('Timezone Service', e.toString());

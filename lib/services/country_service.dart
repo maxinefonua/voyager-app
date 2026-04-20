@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:voyager/config/voyager_api.dart';
 import 'package:voyager/models/country/country.dart';
+import 'package:voyager/models/voyager/paged_response.dart';
 
 class CountryService {
   final Map<String, Country> _countriesCache = {};
@@ -24,20 +25,37 @@ class CountryService {
 
   // Make this private since it's only used internally
   Future<List<Country>> _fetchCountries() async {
+    List<Country> countryList = [];
     try {
       final String url = countriesPath;
-      final response = await http.get(
-        Uri.parse(url),
+      int page = 0;
+      int size = 300;
+      String withPageParams = getPageParams(page, size);
+      String fullUrl = '$url?$withPageParams';
+      http.Response response = await http.get(
+        Uri.parse(fullUrl),
         headers: {voyagerAuthHeader: voyagerAuthToken},
       );
-      if (response.statusCode == 200) {
-        return _countryFromJson(response.body); // Also make private
-      } else {
-        throw Exception('Failed to load countries: ${response.body}');
+      while (response.statusCode == 200) {
+        PagedResponse<Country> pagedResponse = PagedResponse.fromJson(
+          json.decode(response.body),
+          Country.fromJson,
+        );
+        countryList.addAll(pagedResponse.content);
+        if (pagedResponse.last) {
+          return countryList;
+        }
+        page++;
+        withPageParams = getPageParams(page, size);
+        String fullUrl = '$url?$withPageParams';
+        response = await http.get(
+          Uri.parse(fullUrl),
+          headers: {voyagerAuthHeader: voyagerAuthToken},
+        );
       }
+      throw Exception('Failed to fetch airports: ${response.body}');
     } on http.ClientException catch (e) {
-      debugPrint('message: ${e.message}');
-      throw Exception('Failed to load countries: $e');
+      throw Exception('Failed to load airports: $e');
     }
   }
 
@@ -57,12 +75,6 @@ class CountryService {
   }
 
   bool get isInitialized => _isInitialized;
-
-  // Make JSON parsing private too
-  Future<List<Country>> _countryFromJson(String body) async {
-    final List<dynamic> jsonList = json.decode(body);
-    return jsonList.map((jsonItem) => Country.fromJson(jsonItem)).toList();
-  }
 
   void _populateCache(List<Country> countries) {
     _countriesCache.clear();

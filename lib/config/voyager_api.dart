@@ -16,3 +16,7 @@ String get pathPath => '$baseUrl/path';
 String get airlinePath => '$baseUrl/airlines';
 
 const String voyagerAuthHeader = 'X-Api-Key';
+
+String getPageParams(int page, int size) {
+  return 'page=$page&size=$size';
+}
