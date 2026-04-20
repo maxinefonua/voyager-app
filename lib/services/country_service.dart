@@ -17,8 +17,9 @@ class CountryService {
       final countries = await _fetchCountries(); // Now private
       _populateCache(countries);
       _isInitialized = true;
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('Failed to initialize CountryService: $e');
+      debugPrint('Stacktrace: $stackTrace');
       rethrow;
     }
   }
@@ -53,9 +54,9 @@ class CountryService {
           headers: {voyagerAuthHeader: voyagerAuthToken},
         );
       }
-      throw Exception('Failed to fetch airports: ${response.body}');
+      throw Exception('Failed to fetch countries: ${response.body}');
     } on http.ClientException catch (e) {
-      throw Exception('Failed to load airports: $e');
+      throw Exception('Failed to load countries: $e');
     }
   }
 
