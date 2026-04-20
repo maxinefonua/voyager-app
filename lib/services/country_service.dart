@@ -38,7 +38,6 @@ class CountryService {
         headers: {voyagerAuthHeader: voyagerAuthToken},
       );
       while (response.statusCode == 200) {
-        debugPrint(response.body);
         PagedResponse<Country> pagedResponse = PagedResponse.fromJson(
           json.decode(response.body),
           Country.fromJson,
