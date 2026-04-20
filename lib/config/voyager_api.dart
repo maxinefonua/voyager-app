@@ -1,7 +1,7 @@
 import 'package:voyager/models/airline/airline.dart';
 
-// String get baseUrl => "/api";
-String get baseUrl => "http://localhost:8080";
+String get baseUrl => "/api";
+// String get baseUrl => "http://localhost:8080";
 // String get baseUrl => "https://api.voyagerapp.org";
 String get voyagerAuthToken => "dev_api_key";
 
