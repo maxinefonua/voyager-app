@@ -33,10 +33,13 @@ class CountryService {
       int size = 300;
       String withPageParams = getPageParams(page, size);
       String fullUrl = '$url?$withPageParams';
+      debugPrint('pre first call to countries endpoint');
       http.Response response = await http.get(
         Uri.parse(fullUrl),
         headers: {voyagerAuthHeader: voyagerAuthToken},
       );
+      debugPrint(
+          'post first call to countries endpoint, response body: ${response.body}');
       while (response.statusCode == 200) {
         PagedResponse<Country> pagedResponse = PagedResponse.fromJson(
           json.decode(response.body),
